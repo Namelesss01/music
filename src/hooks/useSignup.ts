@@ -1,9 +1,9 @@
-import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
-import { useState } from 'react';
-import { auth, db } from '../firebase/config';
-import { doc, setDoc } from 'firebase/firestore';
-import { useDispatch } from 'react-redux';
-import { setUser } from '@/features/user/userSlice';
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { useState } from "react";
+import { auth, db } from "../firebase/config";
+import { doc, setDoc } from "firebase/firestore";
+import { useDispatch } from "react-redux";
+import { setUser } from "../features/user/userSlice";
 
 interface SignupProps {
   email: string;
@@ -21,15 +21,19 @@ export const useSignup = () => {
     setIsPending(true);
 
     try {
-      const response = await createUserWithEmailAndPassword(auth, email, password);
+      const response = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
 
       if (!response) {
-        throw new Error('Не получилось создать пользователя');
+        throw new Error("Не получилось создать пользователя");
       }
 
       await updateProfile(response.user, { displayName });
 
-      await setDoc(doc(db, 'users', response.user.uid), {
+      await setDoc(doc(db, "users", response.user.uid), {
         online: true,
         displayName,
       });

@@ -2,6 +2,7 @@ import { LINKS_ITEM } from "./const";
 import Logo from "@/assets/img/Logo-head.svg";
 import { User } from "lucide-react";
 import { Link } from "react-router-dom";
+import { Auth } from "../authorization/Auth";
 const Header = () => {
   return (
     <div className="bg-[--dark-blue]">
@@ -20,9 +21,12 @@ const Header = () => {
             </Link>
           ))}
         </div>
-        <Link to="/account-admin">
+        {/* <Link to="/auth">
           <User className="w-8 h-8 text-[--white]" />
-        </Link>
+        </Link> */}
+        <Auth>
+          <User className="w-8 h-8 text-[--white]" />
+        </Auth>
       </div>
     </div>
   );

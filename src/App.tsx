@@ -10,6 +10,7 @@ import AddFile from "./pages/add_file/AddFile";
 import Account from "./pages/account/Account";
 import AdminAccount from "./pages/account-admin/AdminAccount";
 
+
 function App() {
   return (
     <>
@@ -24,6 +25,7 @@ function App() {
           <Route path="/add-file" element={<AddFile />} />
           <Route path="/account" element={<Account />} />
           <Route path="/account-admin" element={<AdminAccount />} />
+          {/* <Route path="/authorization" element={<Auth />} /> */}
         </Routes>
         <Footer />
       </div>

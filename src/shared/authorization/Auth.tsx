@@ -12,6 +12,7 @@ import {
   Dialog,
   DialogTrigger,
   DialogContent,
+  DialogTitle,
 } from "../../components/ui/dialog";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
@@ -131,6 +132,7 @@ export function Auth(props: LayoutProps) {
               Регистрация
             </TabsTrigger>
           </TabsList>
+          <DialogTitle></DialogTitle>
           <TabsContent value="auth">
             <Card>
               <CardHeader>
