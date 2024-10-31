@@ -1,21 +1,25 @@
-import { useEffect, useState } from 'react';
-import { onAuthStateChanged } from 'firebase/auth';
-import { auth } from '../firebase/config';  // Your Firebase config path
+import { useEffect, useState } from "react";
+import { auth, db } from "../firebase/config";
+import { doc, getDoc } from "firebase/firestore";
 
-const useAuthStatus = () => {
+export const useAuthStatus = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isCheckingStatus, setIsCheckingStatus] = useState(true);
+  const [userType, setUserType] = useState<string | null>(null);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setIsLoggedIn(!!user);
-      setIsCheckingStatus(false); 
+    const unsubscribe = auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        setIsLoggedIn(true);
+        // Fetch the user type from Firestore
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        setUserType(userDoc.data()?.userType || null);
+      } else {
+        setIsLoggedIn(false);
+        setUserType(null);
+      }
     });
-
-    return () => unsubscribe();
+    return unsubscribe;
   }, []);
 
-  return { isLoggedIn, isCheckingStatus };
+  return { isLoggedIn, userType };
 };
-
-export default useAuthStatus;
