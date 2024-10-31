@@ -9,6 +9,7 @@ interface SignupProps {
   email: string;
   password: string;
   displayName: string;
+  userType: string; // Add userType
 }
 
 export const useSignup = () => {
@@ -16,10 +17,14 @@ export const useSignup = () => {
   const [isPending, setIsPending] = useState<boolean>(false);
   const dispatch = useDispatch();
 
-  const signup = async ({ email, password, displayName }: SignupProps) => {
+  const signup = async ({
+    email,
+    password,
+    displayName,
+    userType,
+  }: SignupProps) => {
     setError(null);
     setIsPending(true);
-
     try {
       const response = await createUserWithEmailAndPassword(
         auth,
@@ -33,13 +38,15 @@ export const useSignup = () => {
 
       await updateProfile(response.user, { displayName });
 
+      // Save user data including userType in Firestore
       await setDoc(doc(db, "users", response.user.uid), {
         online: true,
         displayName,
+        userType, // Save userType in Firestore
       });
 
       dispatch(setUser(response.user));
-      return response;
+      return response; // Return the response for further processing
     } catch (err: any) {
       setError(err.message);
     } finally {
