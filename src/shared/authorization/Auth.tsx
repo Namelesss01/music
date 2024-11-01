@@ -28,9 +28,8 @@ export function Auth(props: LayoutProps) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<string>("auth");
   const [error, setError] = useState<string>("");
-
   const { signup, error: signupError } = useSignup();
-  const { login, error: loginError } = useLogin();
+  const { login, resetPassword, error: loginError } = useLogin();
   const navigate = useNavigate();
 
   const handleOpen = () => setIsOpen(true);
@@ -45,39 +44,34 @@ export function Auth(props: LayoutProps) {
     setError(loginError);
 
     if (res) {
-      // Check user role after login
       const userDoc = await db.collection("users").doc(res.user.uid).get();
       const userData = userDoc.data();
       if (userData) {
-        if (userData.userType === "admin") {
-          navigate("/account-admin");
-        } else {
-          navigate("/account");
-        }
+        navigate(userData.userType === "admin" ? "/account-admin" : "/account");
       }
-      return handleClose();
+      handleClose();
     }
     setIsLoading(false);
   };
 
   const handleSignUp = async () => {
     setIsLoading(true);
-
-    const res = await signup({
-      displayName,
-      email,
-      password,
-      userType,
-    });
-
+    const res = await signup({ displayName, email, password, userType });
     setError(signupError as string);
 
     if (res) {
-      // Redirect based on userType is handled in the signup hook
       handleClose();
-      return;
     }
     setIsLoading(false);
+  };
+
+  const handlePasswordReset = async () => {
+    if (email) {
+      await resetPassword(email);
+      alert('Если email существует в системе, вы получите письмо для сброса пароля.');
+    } else {
+      setError("Пожалуйста, введите ваш email.");
+    }
   };
 
   useEffect(() => {
@@ -95,10 +89,7 @@ export function Auth(props: LayoutProps) {
   }, []);
 
   const handleClickOutside = (event: MouseEvent) => {
-    if (
-      dialogRef.current &&
-      !dialogRef.current.contains(event.target as Node)
-    ) {
+    if (dialogRef.current && !dialogRef.current.contains(event.target as Node)) {
       handleClose();
     }
   };
@@ -117,10 +108,7 @@ export function Auth(props: LayoutProps) {
             <TabsTrigger value="auth" onClick={() => setActiveTab("auth")}>
               Авторизация
             </TabsTrigger>
-            <TabsTrigger
-              value="registration"
-              onClick={() => setActiveTab("registration")}
-            >
+            <TabsTrigger value="registration" onClick={() => setActiveTab("registration")}>
               Регистрация
             </TabsTrigger>
           </TabsList>
@@ -147,14 +135,11 @@ export function Auth(props: LayoutProps) {
                 <div className="flex items-center justify-between pt-4 pb-2">
                   <div className="flex items-center gap-2">
                     <Checkbox id="terms" className="border-gray-300" />
-                    <label
-                      htmlFor="terms"
-                      className="text-sm font-medium leading-none"
-                    >
+                    <label htmlFor="terms" className="text-sm font-medium leading-none">
                       Запомнить меня
                     </label>
                   </div>
-                  <a href="#" className="text-xs font-medium text-blue-500">
+                  <a href="#" onClick={handlePasswordReset} className="text-xs font-medium text-blue-500">
                     Забыли пароль?
                   </a>
                 </div>
@@ -163,10 +148,9 @@ export function Auth(props: LayoutProps) {
                 <Button
                   onClick={handleLogin}
                   disabled={isLoading}
-                  type="submit"
                   className="w-full bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-200"
                 >
-                  {isLoading ? <Spinner /> : "Войти"}
+                  {isLoading ? <Spinner /> : "Войти"}
                 </Button>
               </CardFooter>
             </Card>
@@ -213,22 +197,14 @@ export function Auth(props: LayoutProps) {
                   <Button
                     onClick={() => setUserType("student")}
                     variant={userType === "student" ? "primary" : "default"}
-                    className={`w-full ${
-                      userType === "student"
-                        ? "bg-blue-500 text-white"
-                        : "bg-gray-200"
-                    } rounded-md transition duration-200`}
+                    className={`w-full ${userType === "student" ? "bg-blue-500 text-white" : "bg-gray-200"} rounded-md transition duration-200`}
                   >
                     Студент
                   </Button>
                   <Button
                     onClick={() => setUserType("admin")}
                     variant={userType === "admin" ? "primary" : "default"}
-                    className={`w-full ${
-                      userType === "admin"
-                        ? "bg-blue-500 text-white"
-                        : "bg-gray-200"
-                    } rounded-md transition duration-200`}
+                    className={`w-full ${userType === "admin" ? "bg-blue-500 text-white" : "bg-gray-200"} rounded-md transition duration-200`}
                   >
                     Админ
                   </Button>

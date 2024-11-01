@@ -13,13 +13,17 @@ const VideoPage = () => {
   useEffect(() => {
     const fetchVideo = async () => {
       try {
-        const docRef = doc(db, "files", id); // Reference to the video document
-        const docSnap = await getDoc(docRef);
-
-        if (docSnap.exists()) {
-          setVideo({ id: docSnap.id, ...docSnap.data() }); // Set the video data
+        if (id) { // Check if id is not undefined
+          const docRef = doc(db, "files", id); // Reference to the video document
+          const docSnap = await getDoc(docRef);
+    
+          if (docSnap.exists()) {
+            setVideo({ id: docSnap.id, ...docSnap.data() }); // Set the video data
+          } else {
+            console.error("Video not found");
+          }
         } else {
-          console.error("Video not found");
+          console.error("Video ID is undefined");
         }
       } catch (error) {
         console.error("Error fetching video: ", error);
@@ -62,6 +66,7 @@ const VideoPage = () => {
                   kind: "subtitles",
                   src: "subs/subtitles.en.vtt",
                   srcLang: "en",
+                  label: "English subtitles", // Add a label property
                   default: true,
                 },
               ],
