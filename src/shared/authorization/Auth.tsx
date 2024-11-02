@@ -1,10 +1,24 @@
 import { Button } from "../../components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../../components/ui/card";
 import { Checkbox } from "../../components/ui/checkbox";
-import { Dialog, DialogTrigger, DialogContent } from "../../components/ui/dialog";
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+} from "../../components/ui/dialog";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../components/ui/tabs";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "../../components/ui/tabs";
 import { useEffect, useRef, useState } from "react";
 import { useSignup } from "../../hooks/useSignup";
 import { useLogin } from "../../hooks/useLogin";
@@ -13,6 +27,7 @@ import { useNavigate } from "react-router-dom";
 import { DialogTitle } from "../../components/ui/dialog";
 import { CardFooter } from "../../components/ui/card";
 import { db } from "../../firebase/config";
+import { getFirestore, collection } from "firebase/firestore";
 
 interface LayoutProps {
   children: React.ReactNode;
