@@ -17,6 +17,8 @@ export const useSignup = () => {
   const [isPending, setIsPending] = useState<boolean>(false);
   const dispatch = useDispatch();
 
+  
+
   const signup = async ({
     email,
     password,
@@ -43,6 +45,7 @@ export const useSignup = () => {
         online: true,
         displayName,
         userType, // Save userType in Firestore
+        uid: response.user.uid, // Optionally save the user ID
       });
 
       dispatch(setUser(response.user));

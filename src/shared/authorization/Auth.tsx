@@ -1,10 +1,24 @@
 import { Button } from "../../components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../../components/ui/card";
 import { Checkbox } from "../../components/ui/checkbox";
-import { Dialog, DialogTrigger, DialogContent } from "../../components/ui/dialog";
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+} from "../../components/ui/dialog";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../components/ui/tabs";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "../../components/ui/tabs";
 import { useEffect, useRef, useState } from "react";
 import { useSignup } from "../../hooks/useSignup";
 import { useLogin } from "../../hooks/useLogin";
@@ -13,6 +27,9 @@ import { useNavigate } from "react-router-dom";
 import { DialogTitle } from "../../components/ui/dialog";
 import { CardFooter } from "../../components/ui/card";
 import { db } from "../../firebase/config";
+import { setDoc, doc } from "firebase/firestore"; // Импортируем setDoc и doc
+import { getDoc } from "firebase/firestore";
+import { collection} from "firebase/firestore";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -20,17 +37,18 @@ interface LayoutProps {
 
 export function Auth(props: LayoutProps) {
   const dialogRef = useRef<HTMLDivElement | null>(null);
+  const [userUid, setUserUid] = useState<string | null>(null);
   const [displayName, setDisplayName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [fullName, setFullName] = useState<string>(""); // Новое состояние для ФИО
   const [userType, setUserType] = useState<string>("student");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<string>("auth");
   const [error, setError] = useState<string>("");
-
   const { signup, error: signupError } = useSignup();
-  const { login, error: loginError } = useLogin();
+  const { login, resetPassword, error: loginError } = useLogin();
   const navigate = useNavigate();
 
   const handleOpen = () => setIsOpen(true);
@@ -45,45 +63,55 @@ export function Auth(props: LayoutProps) {
     setError(loginError);
 
     if (res) {
-      // Check user role after login
-      const userDoc = await db.collection("users").doc(res.user.uid).get();
+      // Use the correct Firestore syntax
+      const userDocRef = doc(collection(db, "users"), res.user.uid);
+      const userDoc = await getDoc(userDocRef);
       const userData = userDoc.data();
+
       if (userData) {
-        if (userData.userType === "admin") {
-          navigate("/account-admin");
-        } else {
-          navigate("/account");
-        }
+        setUserUid(res.user.uid); // Store UID in state
+        navigate(userData.userType === "admin" ? "/account-admin" : "/account");
       }
-      return handleClose();
+      handleClose();
     }
     setIsLoading(false);
   };
 
   const handleSignUp = async () => {
     setIsLoading(true);
-
-    const res = await signup({
-      displayName,
-      email,
-      password,
-      userType,
-    });
-
+    const res = await signup({ displayName, email, password, userType });
     setError(signupError as string);
 
     if (res) {
-      // Redirect based on userType is handled in the signup hook
+      setUserUid(res.user.uid); // Store UID in state
+
+      await setDoc(doc(db, "users", res.user.uid), {
+        displayName,
+        email,
+        userType,
+        fullName,
+      });
       handleClose();
-      return;
     }
     setIsLoading(false);
+  };
+
+  const handlePasswordReset = async () => {
+    if (email) {
+      await resetPassword(email);
+      alert(
+        "Если email существует в системе, вы получите письмо для сброса пароля."
+      );
+    } else {
+      setError("Пожалуйста, введите ваш email.");
+    }
   };
 
   useEffect(() => {
     setEmail("");
     setPassword("");
     setDisplayName("");
+    setFullName(""); // Сбрасываем ФИО
     setError("");
   }, [activeTab]);
 
@@ -154,7 +182,11 @@ export function Auth(props: LayoutProps) {
                       Запомнить меня
                     </label>
                   </div>
-                  <a href="#" className="text-xs font-medium text-blue-500">
+                  <a
+                    href="#"
+                    onClick={handlePasswordReset}
+                    className="text-xs font-medium text-blue-500"
+                  >
                     Забыли пароль?
                   </a>
                 </div>
@@ -163,10 +195,9 @@ export function Auth(props: LayoutProps) {
                 <Button
                   onClick={handleLogin}
                   disabled={isLoading}
-                  type="submit"
                   className="w-full bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-200"
                 >
-                  {isLoading ? <Spinner /> : "Войти"}
+                  {isLoading ? <Spinner /> : "Войти"}
                 </Button>
               </CardFooter>
             </Card>
@@ -179,14 +210,15 @@ export function Auth(props: LayoutProps) {
               </CardHeader>
               <CardContent className="space-y-5">
                 <div>
-                  <Label htmlFor="displayName">Имя</Label>
+                  <Label htmlFor="fullName">ФИО</Label>
                   <Input
-                    onChange={(e) => setDisplayName(e.target.value)}
-                    value={displayName}
-                    placeholder="Имя"
+                    onChange={(e) => setFullName(e.target.value)} // Обновление состояния для ФИО
+                    value={fullName}
+                    placeholder="ФИО"
                     className="border rounded-md p-2 w-full"
                   />
                 </div>
+
                 <div>
                   <Label htmlFor="email">Почта</Label>
                   <Input
