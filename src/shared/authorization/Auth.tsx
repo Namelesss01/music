@@ -27,7 +27,9 @@ import { useNavigate } from "react-router-dom";
 import { DialogTitle } from "../../components/ui/dialog";
 import { CardFooter } from "../../components/ui/card";
 import { db } from "../../firebase/config";
-import { getFirestore, collection } from "firebase/firestore";
+import { setDoc, doc } from "firebase/firestore"; // Импортируем setDoc и doc
+import { getDoc } from "firebase/firestore";
+import { collection} from "firebase/firestore";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -35,9 +37,11 @@ interface LayoutProps {
 
 export function Auth(props: LayoutProps) {
   const dialogRef = useRef<HTMLDivElement | null>(null);
+  const [userUid, setUserUid] = useState<string | null>(null);
   const [displayName, setDisplayName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [fullName, setFullName] = useState<string>(""); // Новое состояние для ФИО
   const [userType, setUserType] = useState<string>("student");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -59,9 +63,13 @@ export function Auth(props: LayoutProps) {
     setError(loginError);
 
     if (res) {
-      const userDoc = await db.collection("users").doc(res.user.uid).get();
+      // Use the correct Firestore syntax
+      const userDocRef = doc(collection(db, "users"), res.user.uid);
+      const userDoc = await getDoc(userDocRef);
       const userData = userDoc.data();
+
       if (userData) {
+        setUserUid(res.user.uid); // Store UID in state
         navigate(userData.userType === "admin" ? "/account-admin" : "/account");
       }
       handleClose();
@@ -75,6 +83,14 @@ export function Auth(props: LayoutProps) {
     setError(signupError as string);
 
     if (res) {
+      setUserUid(res.user.uid); // Store UID in state
+
+      await setDoc(doc(db, "users", res.user.uid), {
+        displayName,
+        email,
+        userType,
+        fullName,
+      });
       handleClose();
     }
     setIsLoading(false);
@@ -83,7 +99,9 @@ export function Auth(props: LayoutProps) {
   const handlePasswordReset = async () => {
     if (email) {
       await resetPassword(email);
-      alert('Если email существует в системе, вы получите письмо для сброса пароля.');
+      alert(
+        "Если email существует в системе, вы получите письмо для сброса пароля."
+      );
     } else {
       setError("Пожалуйста, введите ваш email.");
     }
@@ -93,6 +111,7 @@ export function Auth(props: LayoutProps) {
     setEmail("");
     setPassword("");
     setDisplayName("");
+    setFullName(""); // Сбрасываем ФИО
     setError("");
   }, [activeTab]);
 
@@ -104,7 +123,10 @@ export function Auth(props: LayoutProps) {
   }, []);
 
   const handleClickOutside = (event: MouseEvent) => {
-    if (dialogRef.current && !dialogRef.current.contains(event.target as Node)) {
+    if (
+      dialogRef.current &&
+      !dialogRef.current.contains(event.target as Node)
+    ) {
       handleClose();
     }
   };
@@ -123,7 +145,10 @@ export function Auth(props: LayoutProps) {
             <TabsTrigger value="auth" onClick={() => setActiveTab("auth")}>
               Авторизация
             </TabsTrigger>
-            <TabsTrigger value="registration" onClick={() => setActiveTab("registration")}>
+            <TabsTrigger
+              value="registration"
+              onClick={() => setActiveTab("registration")}
+            >
               Регистрация
             </TabsTrigger>
           </TabsList>
@@ -150,11 +175,18 @@ export function Auth(props: LayoutProps) {
                 <div className="flex items-center justify-between pt-4 pb-2">
                   <div className="flex items-center gap-2">
                     <Checkbox id="terms" className="border-gray-300" />
-                    <label htmlFor="terms" className="text-sm font-medium leading-none">
+                    <label
+                      htmlFor="terms"
+                      className="text-sm font-medium leading-none"
+                    >
                       Запомнить меня
                     </label>
                   </div>
-                  <a href="#" onClick={handlePasswordReset} className="text-xs font-medium text-blue-500">
+                  <a
+                    href="#"
+                    onClick={handlePasswordReset}
+                    className="text-xs font-medium text-blue-500"
+                  >
                     Забыли пароль?
                   </a>
                 </div>
@@ -178,14 +210,15 @@ export function Auth(props: LayoutProps) {
               </CardHeader>
               <CardContent className="space-y-5">
                 <div>
-                  <Label htmlFor="displayName">Имя</Label>
+                  <Label htmlFor="fullName">ФИО</Label>
                   <Input
-                    onChange={(e) => setDisplayName(e.target.value)}
-                    value={displayName}
-                    placeholder="Имя"
+                    onChange={(e) => setFullName(e.target.value)} // Обновление состояния для ФИО
+                    value={fullName}
+                    placeholder="ФИО"
                     className="border rounded-md p-2 w-full"
                   />
                 </div>
+
                 <div>
                   <Label htmlFor="email">Почта</Label>
                   <Input
@@ -212,14 +245,22 @@ export function Auth(props: LayoutProps) {
                   <Button
                     onClick={() => setUserType("student")}
                     variant={userType === "student" ? "primary" : "default"}
-                    className={`w-full ${userType === "student" ? "bg-blue-500 text-white" : "bg-gray-200"} rounded-md transition duration-200`}
+                    className={`w-full ${
+                      userType === "student"
+                        ? "bg-blue-500 text-white"
+                        : "bg-gray-200"
+                    } rounded-md transition duration-200`}
                   >
                     Студент
                   </Button>
                   <Button
                     onClick={() => setUserType("admin")}
                     variant={userType === "admin" ? "primary" : "default"}
-                    className={`w-full ${userType === "admin" ? "bg-blue-500 text-white" : "bg-gray-200"} rounded-md transition duration-200`}
+                    className={`w-full ${
+                      userType === "admin"
+                        ? "bg-blue-500 text-white"
+                        : "bg-gray-200"
+                    } rounded-md transition duration-200`}
                   >
                     Админ
                   </Button>
