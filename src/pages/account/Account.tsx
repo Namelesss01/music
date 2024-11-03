@@ -5,8 +5,8 @@ import  User  from "../../assets/icon/user-icon.svg";
 const Account = () => {
   return (
     <div className="flex justify-center items-end my-[70px] bg-[--white]">
-      <div className="flex items-center gap-[70px]">
-        <div className="bg-gray-300 w-[300px] h-[400px] rounded-md flex items-center justify-center">
+      <div className="md:flex gap-[70px]">
+        <div className="bg-gray-300 w-[300px] h-[400px] rounded-md flex ml-24 md:ml-0 items-center justify-center mb-10">
           <img src={User} alt="" />
         </div>
 
