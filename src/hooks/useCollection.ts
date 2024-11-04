@@ -1,19 +1,47 @@
 import { useEffect, useRef, useState } from "react";
-import { collection, onSnapshot, query } from "firebase/firestore";
+import {
+  collection,
+  query,
+  QueryConstraint,
+  onSnapshot,
+  Query,
+  DocumentData,
+} from "firebase/firestore";
 import { db } from "../firebase/config";
 
-export const useCollection = (collectionName, _query, _order) => {
-  const [documents, setDocuments] = useState(null);
-  const [error, setError] = useState(null);
+// Define the type for the return value of useCollection
+interface UseCollectionResult {
+  documents: DocumentData[] | null;
+  error: string | null;
+  fetchCollection: (options: {
+    fetchQuery?: QueryConstraint;
+    fetchOrder?: QueryConstraint;
+  }) => void;
+}
 
-  let unsub;
+// Update the types in the hook parameters and state
+export const useCollection = (
+  collectionName: string,
+  _query?: QueryConstraint,
+  _order?: QueryConstraint
+): UseCollectionResult => {
+  const [documents, setDocuments] = useState<DocumentData[] | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  let unsub: () => void;
 
   const queryRef = useRef(_query).current;
   const orderRef = useRef(_order).current;
 
-  const fetchCollection = ({ fetchQuery, fetchOrder }) => {
+  const fetchCollection = ({
+    fetchQuery,
+    fetchOrder,
+  }: {
+    fetchQuery?: QueryConstraint;
+    fetchOrder?: QueryConstraint;
+  }) => {
     setDocuments(null);
-    let ref = collection(db, collectionName);
+    let ref: Query<DocumentData> = collection(db, collectionName);
 
     if (queryRef) {
       ref = query(ref, fetchQuery ?? queryRef); // Фильтрация
@@ -24,7 +52,7 @@ export const useCollection = (collectionName, _query, _order) => {
     }
 
     unsub = onSnapshot(ref, (snapshot) => {
-      let results = [];
+      let results: DocumentData[] = [];
 
       snapshot.docs.forEach((doc) => {
         results.push({ ...doc.data(), id: doc.id });
