@@ -3,12 +3,25 @@ import { useState } from "react";
 import { Button } from "../../components/ui/button";
 import GitarLink from "../../assets/img/link-gitar.png";
 import VocalLink from "../../assets/img/link-vocal.png";
-import gitare from "../../assets/img/gitare.png";
 import People from "../../assets/img/people.png";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../../components/ui/accordion";
+import gitare from "../../assets/img/gitare.png";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "../../components/ui/accordion";
 import { Input } from "../../components/ui/input";
-import { db } from "../../firebase/config"; // Импортируем db
-import { collection, addDoc } from "firebase/firestore"; // Импортируем Firestore функции
+import { db } from "../../firebase/config";
+import { collection, addDoc } from "firebase/firestore";
+
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "../../components/ui/carousel";
 
 const Main = () => {
   const [formData, setFormData] = useState({
@@ -20,7 +33,7 @@ const Main = () => {
 
   // Слайды для карусели
   const slides = [
-    { id: 1, content: "Слайд 1", bgColor: "bg-red-500" },
+    { id: 1, content: "Слайд 1"	, bgColor: "bg-red-500" },
     { id: 2, content: "Слайд 2", bgColor: "bg-green-500" },
     { id: 3, content: "Слайд 3", bgColor: "bg-blue-500" },
     { id: 4, content: "Слайд 4", bgColor: "bg-yellow-500" },
@@ -40,8 +53,8 @@ const Main = () => {
 
   // Обработчик отправки формы
   const handleSubmit = async (e) => {
-    e.preventDefault(); // предотвращаем перезагрузку страницы
-    setIsSubmitting(true); // начинаем отправку
+    e.preventDefault();
+    setIsSubmitting(true);
 
     try {
       // Добавляем данные в коллекцию Firestore
@@ -59,67 +72,150 @@ const Main = () => {
   };
 
   return (
-    <div className="max-w-[1920px] mx-auto">
-      <div className="relative">
-        <img className="w-full max-h-[675px] mx-auto" src={Main_bg} alt="main" />
-        <h1 className="absolute top-[210px] left-[50%] translate-x-[-50%] text-6xl font-extrabold text-[--white]">
-          Школа Музыки
-        </h1>
-        <h2 className="font-medium absolute top-[390px] left-[50%] translate-x-[-50%] text-3xl text-[--white]">
-          Почувствуй магию музыки прямо сейчас
-        </h2>
-        <Button className="absolute top-[450px] left-[50%] translate-x-[-50%] text-lg font-medium px-10 py-5">
-          Начать
-        </Button>
-      </div>
-
-      <div className="flex justify-center my-14 relative">
-        <div className="w-[700px] ml-20 transform transition-transform duration-300 hover:scale-125">
-          <img src={GitarLink} alt="" />
-          <p className="absolute top-7 left-7 text-3xl font-bold text-[--white]">Уроки игры на гитаре</p>
-        </div>
-        <div className="w-[700px] mr-20 transform transition-transform duration-300 hover:scale-125">
-          <img src={VocalLink} alt="" />
-          <p className="absolute bottom-8 right-28 text-3xl font-bold text-[--white]">Уроки вокала</p>
+    <div className="max-w-[1920px] mx-auto overflow-x-hidden">
+      <div
+        className="relative h-[675px] bg-cover bg-center"
+        style={{ backgroundImage: `url(${Main_bg})` }}
+      >
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center text-[--white]">
+          <h1 className="text-5xl md:text-6xl font-extrabold">Школа Музыки</h1>
+          <h2 className="mt-4 text-xl md:text-3xl font-medium">
+            Почувствуй магию музыки прямо сейчас
+          </h2>
+          <Button className="mt-8 text-lg font-medium px-10 py-5">
+            Начать
+          </Button>
         </div>
       </div>
 
-      <h2 className="text-4xl text-left ml-[50px] mt-10">Часто задаваемые вопросы</h2>
-      <div className="flex justify-between mb-[50px]">
+      <div className="flex flex-col md:flex-row justify-center my-14 space-y-10 md:space-y-0 md:space-x-10 relative">
+        {/* Уроки игры на гитаре */}
+        <div className="w-full md:w-[700px] transform transition-transform duration-300 hover:scale-125">
+          <img src={GitarLink} alt="Гитара" className="w-full" />
+          <p className="absolute top-7 left-7 text-3xl font-bold text-[--white]">
+            Уроки игры на гитаре
+          </p>
+        </div>
+        {/* Уроки вокала */}
+        <div className="w-full md:w-[700px] transform transition-transform duration-300 hover:scale-125">
+          <img src={VocalLink} alt="Вокал" className="w-full" />
+          <p className="absolute bottom-8 right-28 text-3xl font-bold text-[--white]">
+            Уроки вокала
+          </p>
+        </div>
+      </div>
+      <div className="bg-[--dark-blue] h-[575px] w-full flex items-center justify-center relative overflow-hidden">
+        <Carousel className="w-full max-w-[1200px] max-h-[500px]">
+          <CarouselContent>
+            {Array.from({ length: 5 }).map((_, index) => (
+              <CarouselItem key={index}>
+                <div className="p-1 flex"> 
+                      <img src={slides[index].content} alt="#" className="w-full h-[500px]"/>
+                </div>
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+          <CarouselPrevious />
+          <CarouselNext />
+        </Carousel>
+      </div>
+      <h2 className="text-4xl text-left ml-[50px] mt-10">
+        Часто задаваемые вопросы
+      </h2>
+      <div className="flex flex-col md:flex-row justify-between mb-[50px]">
         <div>
-          <Accordion className="min-w-[850px] mt-[50px] ml-[50px] rounded-lg" type="single" collapsible>
-            {/* Accordion items */}
+          <Accordion
+            className="min-w-full mt-[50px] md:ml-[50px] rounded-lg"
+            type="single"
+            collapsible
+          >
+            {[
+              {
+                question:
+                  "Я совсем новичок. Смогу ли я освоить вокал/гитару с нуля на этом курсе?",
+                answer:
+                  "Да, курс подходит для начинающих. Мы начинаем с основ и постепенно переходим к более сложным техникам. Вам не обязательно иметь музыкальный опыт — главное, это желание учиться и практика.",
+              },
+              {
+                question:
+                  "Как проходит обучение: это онлайн-курс или живые занятия?",
+                answer:
+                  "Курс проходит онлайн, поэтому вы можете учиться из любого места с доступом к интернету. Уроки будут в виде живых трансляций или записей, а также будут доступны дополнительные материалы, чтобы можно было повторять пройденное в удобное время.",
+              },
+              {
+                question:
+                  "Нужен ли мне профессиональный инструмент или можно начать с бюджетного?",
+                answer:
+                  "Для начинающих подойдет и недорогая гитара, главное, чтобы инструмент был настроен и удобен для вас. Также, если вы занимаетесь вокалом, профессиональное оборудование не обязательно — достаточно наушников с микрофоном для обратной связи с преподавателем.",
+              },
+              {
+                question:
+                  "Сколько времени нужно заниматься, чтобы увидеть результаты?",
+                answer:
+                  "Прогресс зависит от вашей практики. Обычно заметные улучшения можно увидеть через 2-3 недели регулярных занятий. Рекомендуется уделять практике хотя бы 20–30 минут в день для достижения стабильных результатов.",
+              },
+              {
+                question: "Получим ли мы сертификат по окончании курса?",
+                answer:
+                  "Да, по завершении курса вы получите сертификат, подтверждающий ваши навыки и успехи в вокале или игре на гитаре. Сертификат будет отличным дополнением к вашему портфолио или резюме.",
+              },
+            ].map((item, index) => (
+              <AccordionItem
+                key={index}
+                value={`item-${index + 1}`}
+                className="rounded-lg bg-[--light-blue] px-8 mb-5 max-w-[800px]"
+              >
+                <AccordionTrigger className="text-xl">
+                  {item.question}
+                </AccordionTrigger>
+                <AccordionContent className="text-xl max-h-[150px] overflow-y-auto">
+                  {item.answer}
+                </AccordionContent>
+              </AccordionItem>
+            ))}
           </Accordion>
         </div>
-        <div>
-          <img className="-mt-24 mr-20 rotate-[17deg] h-[600px]" src={gitare} alt="" />
+        <div className="hidden md:flex w-full md:w-[500px] mt-10 mr-20 transform md:rotate-[17deg]">
+          <img
+            className="h-[400px] md:h-[600px]"
+            src={gitare}
+            alt=""
+          />
         </div>
       </div>
 
       <div className="flex justify-between">
-        <div>
+        <div className="hidden md:flex">
           <img className="ml-[50px] w-[700px]" src={People} alt="People" />
         </div>
-        <div className="px-10 mr-[50px] min-w-[600px] rounded-xl bg-[--white] shadow-[5px_5px_10px_rgba(0,0,0,0.25),-5px_-5px_10px_rgba(0,0,0,0.25)]">
-          <h3 className="text-3xl pt-14 pb-8 font-semibold text-center">Оставить заявку</h3>
+        <div className="px-10 mr-[50px] min-w-[600px] rounded-xl bg-[--white] shadow-[5px_5px_10px_rgba(0,0,0,0.25),-5px_-5px_10px_rgba(0,0,0,0.25)] ml-5 md:ml-0">
+          <h3 className="text-3xl pt-14 pb-8 font-semibold text-center">
+            Оставить заявку
+          </h3>
           <form onSubmit={handleSubmit}>
             <Input
               className="bg-[--light-blue] mb-5 p-6 text-lg"
               placeholder="Имя"
               value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, name: e.target.value })
+              }
             />
             <Input
               className="bg-[--light-blue] mb-5 p-6 text-lg"
               placeholder="Номер тел:"
               value={formData.phone}
-              onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, phone: e.target.value })
+              }
             />
             <Input
               className="bg-[--light-blue] mb-5 p-6 text-lg"
               placeholder="Курс"
               value={formData.course}
-              onChange={(e) => setFormData({ ...formData, course: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, course: e.target.value })
+              }
             />
             <div className="flex justify-center">
               <Button type="submit" className="mt-8" disabled={isSubmitting}>
