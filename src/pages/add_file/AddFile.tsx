@@ -74,8 +74,8 @@ const AddFile = () => {
 
   return (
     <div className="flex justify-center my-[100px]">
-      <form onSubmit={(e) => e.preventDefault()} className="flex">
-        <div className="border-2 border-dashed border-[#AFAFAF] bg-white/50 p-6 rounded-lg text-center w-[700px] min-h-[300px] mx-[50px]">
+      <form onSubmit={(e) => e.preventDefault()} className="md:flex px-16">
+        <div className="max-w-[750px] md:w-[700px] border-2 border-dashed border-[#AFAFAF] bg-white/50 p-6 rounded-lg text-center min-h-[300px] md:mx-[50px]">
           <label
             htmlFor="file-upload"
             className="cursor-pointer flex flex-col items-center mt-11 mb-3 space-y-2"

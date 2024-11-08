@@ -10,16 +10,16 @@ const Footer = () => {
       id="footer"
       className="bg-[--dark-blue] h-[200px] w-full flex justify-center items-center mt-[50px]"
     >
-      <div>
-        <img className="" src={Logo} alt="" />
+      <div className="ml-4 md:ml-0">
+        <img className="w-[97px] h-[50px] mr-[150px]" src={Logo} alt="" />
       </div>
       <div>
         <Separator
-          className="w-[2px] h-[130px] ml-[150px]"
+          className="w-[2px] h-[130px]"
           orientation="vertical"
         />
       </div>
-      <div className="ml-[150px]">
+      <div className="mx-16">
         <div className="flex gap-4">
           {LINKS_ITEM.map((link) => (
             <Link
@@ -33,7 +33,7 @@ const Footer = () => {
         </div>
         <p className="text-[--white] text-base">© 2024 Music. Just do it.</p>
       </div>
-      <div>
+      <div className="hidden md:flex">
         <div className="ml-[150px]">
           <div className="flex gap-3">
             {ICONS_ITEM.map((icon) => (

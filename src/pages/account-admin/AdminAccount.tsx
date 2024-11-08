@@ -108,9 +108,9 @@ const AdminAccount = () => {
   return (
     <div>
       <div className="flex justify-center items-end my-[70px] bg-[--white]">
-        <div className="flex items-center gap-[70px]">
-          <div className="bg-gray-300 w-[300px] h-[400px] rounded-md flex items-center justify-center">
-            <img src={User} alt="User Icon" />
+        <div className="md:flex items-center gap-[70px]">
+          <div className="bg-gray-300 w-[300px] h-[400px] rounded-md ml-24 md:ml-0 flex items-center justify-center mb-10">
+            <img src={User} alt="" />
           </div>
 
           <div className="flex flex-col space-y-4">

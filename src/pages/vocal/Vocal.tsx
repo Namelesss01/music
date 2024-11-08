@@ -70,7 +70,7 @@ const Vocal = () => {
         Уроки вокальной музыки
       </h2>
 
-      <div className="flex flex-wrap justify-start gap-6">
+      <div className="sm:flex flex-wrap justify-start gap-6">
         {currentVideos.map((video, index) => (
           <div key={video.id} className="w-full md:w-[calc(33.333%-16px)] p-4">
             <Link to={`/videos/${video.id}`}>
