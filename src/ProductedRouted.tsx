@@ -1,20 +1,27 @@
+import { ReactNode } from "react";
 import { Navigate } from "react-router-dom";
-import { useAuthStatus } from "./hooks/useAuthStatus"; // Импортируйте ваш хук для проверки статуса аутентификации
+import { useAuthStatus } from "./hooks/useAuthStatus";
 
-const ProtectedRoute = ({ children, allowedUserType }) => {
+// Define props type for ProtectedRoute
+interface ProtectedRouteProps {
+  children: ReactNode;
+  allowedUserType: string;
+}
+
+const ProtectedRoute = ({ children, allowedUserType }: ProtectedRouteProps) => {
   const { isLoggedIn, userType } = useAuthStatus();
 
-  // Если пользователь не вошёл в систему, перенаправьте на страницу входа или главную
+  // Redirect if user is not logged in
   if (!isLoggedIn) {
     return <Navigate to="/main" />;
   }
 
-  // Если тип пользователя не совпадает с разрешённым, перенаправьте
+  // Redirect if user type does not match allowed type
   if (userType !== allowedUserType) {
     return <Navigate to="#" />;
   }
 
-  return children; // Возвращаем детей, если проверка пройдена
+  return <>{children}</>; // Return children if checks pass
 };
 
 export default ProtectedRoute;
