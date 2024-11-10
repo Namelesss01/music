@@ -6,6 +6,7 @@ import {
   onSnapshot,
   updateDoc,
   doc,
+  getDoc,
 } from "firebase/firestore";
 import { db } from "../../firebase/config";
 import { Input } from "../../components/ui/input";
@@ -40,6 +41,10 @@ const AdminAccount = () => {
   const [fullName, setFullName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [info, setInfo] = useState("");
+
+  const auth = getAuth();
+  const user = auth.currentUser;
+  const userUid = user ? user.uid : null; // Ensure userUid is defined
 
   useEffect(() => {
     const studentQuery = query(
@@ -90,13 +95,23 @@ const AdminAccount = () => {
   };
 
   const updateAccountInfo = async () => {
-    const auth = getAuth();
-    const user = auth.currentUser;
-    const userUid = user ? user.uid : null; // Ensure userUid is defined
-
     if (userUid) {
       try {
-        // Proceed with your update logic here using userUid
+        // Get the user document reference
+        const userDocRef = doc(db, "users", userUid);
+
+        // Get the current document data (if needed)
+        const userSnap = await getDoc(userDocRef);
+
+        if (userSnap.exists()) {
+          // Update the user info with the new values
+          await updateDoc(userDocRef, {
+            fullName,
+            phoneNumber,
+            info,
+          });
+          alert("Данные аккаунта обновлены успешно!");
+        }
       } catch (error) {
         console.error("Error updating account info:", error);
       }
