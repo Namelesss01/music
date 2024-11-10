@@ -14,7 +14,7 @@ import {
 import { Input } from "../../components/ui/input";
 import { db } from "../../firebase/config";
 import { collection, addDoc } from "firebase/firestore";
-
+import { useRef } from "react";
 import {
   Carousel,
   CarouselContent,
@@ -22,8 +22,16 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "../../components/ui/carousel";
+import { Link } from "react-router-dom";
 
 const Main = () => {
+  const formRef = useRef(null); // Создаем реф для формы
+
+  const handleScrollToForm = () => {
+    // При клике на кнопку прокручиваем страницу к форме
+    formRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
@@ -33,7 +41,7 @@ const Main = () => {
 
   // Слайды для карусели
   const slides = [
-    { id: 1, content: "Слайд 1"	, bgColor: "bg-red-500" },
+    { id: 1, content: "Слайд 1", bgColor: "bg-red-500" },
     { id: 2, content: "Слайд 2", bgColor: "bg-green-500" },
     { id: 3, content: "Слайд 3", bgColor: "bg-blue-500" },
     { id: 4, content: "Слайд 4", bgColor: "bg-yellow-500" },
@@ -72,9 +80,9 @@ const Main = () => {
   };
 
   return (
-    <div className="max-w-[1920px] mx-auto overflow-x-hidden">
+    <div className="max-w-[1920px] mx-auto overflow-hidden">
       <div
-        className="relative h-[675px] bg-cover bg-center"
+        className="relative h-[400px] md:h-[675px] bg-cover bg-center "
         style={{ backgroundImage: `url(${Main_bg})` }}
       >
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center text-[--white]">
@@ -82,7 +90,10 @@ const Main = () => {
           <h2 className="mt-4 text-xl md:text-3xl font-medium">
             Почувствуй магию музыки прямо сейчас
           </h2>
-          <Button className="mt-8 text-lg font-medium px-10 py-5">
+          <Button
+            className="mt-8 text-lg font-medium px-10 py-5"
+            onClick={handleScrollToForm}
+          >
             Начать
           </Button>
         </div>
@@ -90,35 +101,57 @@ const Main = () => {
 
       <div className="flex flex-col md:flex-row justify-center my-14 space-y-10 md:space-y-0 md:space-x-10 relative">
         {/* Уроки игры на гитаре */}
-        <div className="w-full md:w-[700px] transform transition-transform duration-300 hover:scale-125">
-          <img src={GitarLink} alt="Гитара" className="w-full" />
-          <p className="absolute top-7 left-7 text-3xl font-bold text-[--white]">
-            Уроки игры на гитаре
-          </p>
-        </div>
+        <Link to="/gitare">
+          <div className="w-full md:w-[700px] transform transition-transform duration-300 hover:scale-125">
+            <img src={GitarLink} alt="Гитара" className="w-full" />
+            <p className="absolute top-7 left-7 text-3xl font-bold text-[--white]">
+              Уроки игры на гитаре
+            </p>
+          </div>
+        </Link>
         {/* Уроки вокала */}
-        <div className="w-full md:w-[700px] transform transition-transform duration-300 hover:scale-125">
-          <img src={VocalLink} alt="Вокал" className="w-full" />
-          <p className="absolute bottom-8 right-28 text-3xl font-bold text-[--white]">
-            Уроки вокала
-          </p>
-        </div>
+        <Link to="/vocal">
+          <div className="w-full md:w-[700px] transform transition-transform duration-300 hover:scale-125">
+            <img src={VocalLink} alt="Вокал" className="w-full" />
+            <p className="absolute bottom-8 right-28 text-3xl font-bold text-[--white]">
+              Уроки вокала
+            </p>
+          </div>
+        </Link>
       </div>
       <div className="bg-[--dark-blue] h-[575px] w-full flex items-center justify-center relative overflow-hidden">
         <Carousel className="w-full max-w-[1200px] max-h-[500px]">
           <CarouselContent>
-            {Array.from({ length: 5 }).map((_, index) => (
+            {[
+              "https://avatars.mds.yandex.net/i?id=9c0c7e3cfb343bd161dc1169947b49ec_l-4766454-images-thumbs&n=13",
+              "https://avatars.mds.yandex.net/i?id=9c0c7e3cfb343bd161dc1169947b49ec_l-4766454-images-thumbs&n=13",
+              "https://avatars.mds.yandex.net/i?id=9c0c7e3cfb343bd161dc1169947b49ec_l-4766454-images-thumbs&n=13",
+              "https://avatars.mds.yandex.net/i?id=9c0c7e3cfb343bd161dc1169947b49ec_l-4766454-images-thumbs&n=13",
+              "https://avatars.mds.yandex.net/i?id=9c0c7e3cfb343bd161dc1169947b49ec_l-4766454-images-thumbs&n=13",
+            ].map((url, index) => (
               <CarouselItem key={index}>
-                <div className="p-1 flex"> 
-                      <img src={slides[index].content} alt="#" className="w-full h-[500px]"/>
+                <div className="p-1 flex relative">
+                  <img
+                    src={url}
+                    alt="Почему музыка важна"
+                    className="w-full h-[500px] object-cover"
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30">
+                    <h2 className="text-white text-3xl md:text-4xl font-bold text-center">
+                      Почему музыка важна
+                    </h2>
+                  </div>
                 </div>
               </CarouselItem>
             ))}
           </CarouselContent>
-          <CarouselPrevious />
-          <CarouselNext />
+          <div className="flex justify-between w-full absolute bottom-1 transform -translate-y-1/2">
+            <CarouselPrevious />
+            <CarouselNext />
+          </div>
         </Carousel>
       </div>
+
       <h2 className="text-4xl text-left ml-[50px] mt-10">
         Часто задаваемые вопросы
       </h2>
@@ -175,20 +208,24 @@ const Main = () => {
             ))}
           </Accordion>
         </div>
-        <div className="hidden md:flex w-full md:w-[500px] mt-10 mr-20 transform md:rotate-[17deg]">
-          <img
-            className="h-[400px] md:h-[600px]"
-            src={gitare}
-            alt=""
-          />
+        <div className="hidden md:flex w-full md:w-[500px] -mt-10 transform md:rotate-[17deg]">
+          <div className="relative perspective-1000">
+            <img
+              className="h-[400px] md:h-[600px] transform transition-all duration-300 ease-in-out hover:rotate-x-12 hover:rotate-y-12 hover:scale-110"
+              src={gitare}
+              alt=""
+            />
+          </div>
         </div>
       </div>
 
-      <div className="flex justify-between">
+      <div className="flex justify-between mb-4" ref={formRef}>
+        {" "}
+        {/* Присваиваем форму ссылке formRef */}
         <div className="hidden md:flex">
           <img className="ml-[50px] w-[700px]" src={People} alt="People" />
         </div>
-        <div className="px-10 mr-[50px] min-w-[600px] rounded-xl bg-[--white] shadow-[5px_5px_10px_rgba(0,0,0,0.25),-5px_-5px_10px_rgba(0,0,0,0.25)] ml-5 md:ml-0">
+        <div className="px-10 mr-[10px] min-w-[300px] md:min-w-[600px] rounded-xl bg-[--white] shadow-[5px_5px_10px_rgba(0,0,0,0.25),-5px_-5px_10px_rgba(0,0,0,0.25)] ml-3 md:ml-0">
           <h3 className="text-3xl pt-14 pb-8 font-semibold text-center">
             Оставить заявку
           </h3>
@@ -217,7 +254,7 @@ const Main = () => {
                 setFormData({ ...formData, course: e.target.value })
               }
             />
-            <div className="flex justify-center">
+            <div className="flex justify-center mb-4">
               <Button type="submit" className="mt-8" disabled={isSubmitting}>
                 {isSubmitting ? "Отправка..." : "Отправить"}
               </Button>

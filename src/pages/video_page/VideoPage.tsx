@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { db } from "../../firebase/config"; // Ensure the path is correct
 import { doc, getDoc } from "firebase/firestore";
 import ReactPlayer from "react-player"; // Import ReactPlayer
@@ -9,16 +9,38 @@ const VideoPage = () => {
   const { id } = useParams<{ id: string }>(); // Get the video ID from the URL
   const [video, setVideo] = useState<any>(null); // Change type to any for flexibility
   const [loading, setLoading] = useState(true);
+  const [accessDenied, setAccessDenied] = useState(false); // New state to track access
+
+  const userUid = "user-uid"; // Replace with actual UID of the logged-in user, e.g., from context or state
 
   useEffect(() => {
     const fetchVideo = async () => {
       try {
-        if (id) { // Check if id is not undefined
+        if (id) {
+          // Check if id is not undefined
           const docRef = doc(db, "files", id); // Reference to the video document
           const docSnap = await getDoc(docRef);
-    
+
           if (docSnap.exists()) {
-            setVideo({ id: docSnap.id, ...docSnap.data() }); // Set the video data
+            const videoData = docSnap.data();
+            setVideo({ id: docSnap.id, ...videoData }); // Set the video data
+
+            // Check if the user has access to this video
+            const userRef = doc(db, "users", userUid); // Reference to the user's document
+            const userSnap = await getDoc(userRef);
+
+            if (userSnap.exists()) {
+              const userData = userSnap.data();
+              // Assuming there's a 'videoAccess' field in the user document
+              const hasAccess = userData?.videoAccess || false; // Or any other access check logic
+
+              if (!hasAccess) {
+                setAccessDenied(true); // Set accessDenied state if no access
+              }
+            } else {
+              console.error("User not found");
+              setAccessDenied(true); // Deny access if user document doesn't exist
+            }
           } else {
             console.error("Video not found");
           }
@@ -33,10 +55,18 @@ const VideoPage = () => {
     };
 
     fetchVideo();
-  }, [id]);
+  }, [id, userUid]);
 
   if (loading) {
     return <div className="loader">Loading...</div>; // Optional loading state
+  }
+
+  if (accessDenied) {
+    return (
+      <div className="access-denied text-center text-red-500 font-bold text-xl">
+        НЕТ ДОСТУПА
+      </div>
+    );
   }
 
   if (!video) {

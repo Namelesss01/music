@@ -38,12 +38,12 @@ const Gitare = () => {
     <div className="max-w-[1920px] mx-auto">
       <div className="relative">
         <img
-          className="w-full h-[750px] mx-auto object-cover"
+          className="w-full h-[750px] mx-auto object-cover md:max-h-[750px] max-h-[500px]"
           src={Gitar}
           alt="Guitar"
         />
       </div>
-      <h2 className="text-4xl font-extrabold text-center my-[50px]">
+      <h2 className="text-4xl font-extrabold text-center my-[50px] px-2">
         Уроки игры на гитаре
       </h2>
 

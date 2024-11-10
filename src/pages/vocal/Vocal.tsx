@@ -61,7 +61,7 @@ const Vocal = () => {
     <div className="max-w-[1920px] mx-auto">
       <div className="relative">
         <img
-          className="w-full h-[750px] mx-auto object-cover"
+          className="w-full h-[750px] mx-auto object-cover md:max-h-[750px] max-h-[500px]"
           src={Vocals}
           alt="Vocal"
         />

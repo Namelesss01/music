@@ -51,7 +51,7 @@ const Header = () => {
   };
 
   return (
-    <div className="bg-[--dark-blue]">
+    <div className="bg-[--dark-blue] overflow-hidden">
       <div className="flex justify-between items-center w-full py-5 px-10">
         <Link to="/">
           <img src={Logo} alt="logo" />
@@ -79,7 +79,13 @@ const Header = () => {
               className="text-white text-3xl"
               onClick={() => setIsMenuOpen(!isMenuOpen)} // Управление состоянием меню
             >
-              &#9776; {/* Символ бургер-меню */}
+              {isMenuOpen ? (
+                // Cross icon (X) when menu is open
+                <span>&#10005;</span>
+              ) : (
+                // Hamburger menu icon when menu is closed
+                <span>&#9776;</span>
+              )}
             </button>
           </div>
 
@@ -122,18 +128,26 @@ const Header = () => {
 
       {/* Бургер-меню для мобильных устройств */}
       {isMenuOpen && (
-        <div className="md:hidden flex flex-col items-center py-4 bg-[--dark-blue]">
-          {LINKS_ITEM.map((link) => (
-            <Link
-              key={link.label}
-              to={link.href === "contacts" ? "#footer" : link.href} // Проверка для контактов
-              className="text-[--white] text-xl py-2"
-              onClick={() => handleLinkClick(link.label)} // Обработчик клика
-            >
-              {link.label}
-            </Link>
-          ))}
-        </div>
+        <>
+          {/* Overlay background to dim the rest of the content */}
+          <div
+            onClick={() => setIsMenuOpen(false)} // Close the menu when clicking outside
+            className="fixed inset-0 bg-black opacity-50 z-40"
+          ></div>
+
+          <div className="md:hidden flex flex-col items-center py-4 bg-[--dark-blue] fixed top-20 left-0 right-0 z-50">
+            {LINKS_ITEM.map((link) => (
+              <Link
+                key={link.label}
+                to={link.href === "contacts" ? "#footer" : link.href} // Проверка для контактов
+                className="text-[--white] text-xl py-2"
+                onClick={() => handleLinkClick(link.label)} // Обработчик клика
+              >
+                {link.label}
+              </Link>
+            ))}
+          </div>
+        </>
       )}
     </div>
   );

@@ -11,7 +11,7 @@ import { db } from "../../firebase/config";
 import { Input } from "../../components/ui/input";
 import { Textarea } from "../../components/ui/textarea";
 import User from "../../assets/icon/user-icon.svg";
-
+import { Link } from "react-router-dom";
 import {
   Table,
   TableBody,
@@ -106,95 +106,92 @@ const AdminAccount = () => {
   };
 
   return (
-    <div>
-      <div className="flex justify-center items-end my-[70px] bg-[--white]">
-        <div className="md:flex items-center gap-[70px]">
-          <div className="bg-gray-300 w-[300px] h-[400px] rounded-md ml-24 md:ml-0 flex items-center justify-center mb-10">
-            <img src={User} alt="" />
-          </div>
+    <div className="p-4 md:p-8">
+      {/* Profile Section */}
+      <div className="flex flex-col md:flex-row justify-center items-start md:items-end gap-8 bg-white p-6 rounded-lg">
+        <div className="bg-gray-300 w-full md:w-[300px] h-[300px] md:h-[400px] rounded-md flex items-center justify-center mb-4 md:mb-0">
+          <img src={User} alt="User Icon" />
+        </div>
 
-          <div className="flex flex-col space-y-4">
-            <Input
-              type="text"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-              className="rounded-md h-12 text-lg bg-[--light-blue] w-[500px] p-2"
-              placeholder="ФИО"
-              disabled={!isAccountEditing}
-            />
-            <Input
-              type="text"
-              value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value)}
-              className="rounded-md h-12 text-lg bg-[--light-blue] w-[500px] p-2 mb-6"
-              placeholder="Номер:"
-              disabled={!isAccountEditing}
-            />
-            <Textarea
-              value={info}
-              onChange={(e) => setInfo(e.target.value)}
-              className="rounded-md h-12 text-lg bg-[--light-blue] w-[500px] p-2 mb-6 max-h-[275px]"
-              placeholder="Информация:"
-              disabled={!isAccountEditing}
-            />
-            {isAccountEditing ? (
-              <Button onClick={updateAccountInfo}>
-                Сохранить данные аккаунта
-              </Button>
-            ) : (
-              <Button onClick={toggleAccountEdit}>
-                Редактировать данные аккаунта
-              </Button>
-            )}
-          </div>
+        <div className="flex flex-col w-full md:w-[500px] space-y-4">
+          <Input
+            type="text"
+            value={fullName}
+            onChange={(e) => setFullName(e.target.value)}
+            className="rounded-md h-12 text-lg bg-[--light-blue] p-2"
+            placeholder="ФИО"
+            disabled={!isAccountEditing}
+          />
+          <Input
+            type="text"
+            value={phoneNumber}
+            onChange={(e) => setPhoneNumber(e.target.value)}
+            className="rounded-md h-12 text-lg bg-[--light-blue] p-2 mb-6"
+            placeholder="Номер:"
+            disabled={!isAccountEditing}
+          />
+          <Textarea
+            value={info}
+            onChange={(e) => setInfo(e.target.value)}
+            className="rounded-md h-12 text-lg bg-[--light-blue] p-2 mb-6"
+            placeholder="Информация:"
+            disabled={!isAccountEditing}
+          />
+          {isAccountEditing ? (
+            <Button onClick={updateAccountInfo}>
+              Сохранить данные аккаунта
+            </Button>
+          ) : (
+            <Button onClick={toggleAccountEdit}>
+              Редактировать данные аккаунта
+            </Button>
+          )}
+          <Link to="/add-file">
+            <Button className="w-full">Добавить видео</Button>
+          </Link>
         </div>
       </div>
 
-      <div className="flex justify-center">
-        <p className="text-4xl mb-10">Список учеников и доступ к урокам</p>
-      </div>
-
-      <div>
-        <Table>
-          <TableCaption>
-            {isEditing ? (
-              <Button onClick={handleSave}>Сохранить данные</Button>
-            ) : (
-              <Button onClick={handleEdit}>Изменить данные</Button>
-            )}
-          </TableCaption>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="text-center">ID</TableHead>
-              <TableHead className="text-center">ФИО Учеников</TableHead>
-              <TableHead className="text-center">Вокал</TableHead>
-              <TableHead className="text-center">Гитара</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {students.map((student, index) => (
-              <TableRow key={student.id}>
-                <TableCell className="text-center">{index + 1}</TableCell>
-                <TableCell className="text-center">
-                  {student.fullName}
-                </TableCell>
-                <TableCell className="text-left">
-                  <div className="flex justify-center">
+      {/* Students Table Section */}
+      <div className="my-10">
+        <p className="text-4xl text-center mb-6">
+          Список учеников и доступ к урокам
+        </p>
+        <div className="overflow-x-auto">
+          <Table>
+            <TableCaption>
+              {isEditing ? (
+                <Button onClick={handleSave}>Сохранить данные</Button>
+              ) : (
+                <Button onClick={handleEdit}>Изменить данные</Button>
+              )}
+            </TableCaption>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="text-center">ID</TableHead>
+                <TableHead className="text-center">ФИО Учеников</TableHead>
+                <TableHead className="text-center">Вокал</TableHead>
+                <TableHead className="text-center">Гитара</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {students.map((student, index) => (
+                <TableRow key={student.id}>
+                  <TableCell className="text-center">{index + 1}</TableCell>
+                  <TableCell className="text-center">
+                    {student.fullName}
+                  </TableCell>
+                  <TableCell className="text-center">
                     <input
                       type="checkbox"
-                      id={`vocal-access-${student.id}`}
-                      className="checkbox"
                       checked={vocalAccess[student.id] || false}
                       disabled={!isEditing}
                       onChange={async () => {
-                        // Toggle vocal access in local state
                         const newVocalAccess = !vocalAccess[student.id];
                         setVocalAccess((prev) => ({
                           ...prev,
                           [student.id]: newVocalAccess,
                         }));
-
-                        // Update vocalAccess in Firestore
                         const studentDocRef = doc(db, "users", student.id);
                         try {
                           await updateDoc(studentDocRef, {
@@ -205,25 +202,18 @@ const AdminAccount = () => {
                         }
                       }}
                     />
-                  </div>
-                </TableCell>
-                <TableCell className="text-center">
-                  <div className="flex justify-center">
+                  </TableCell>
+                  <TableCell className="text-center">
                     <input
                       type="checkbox"
-                      id={`guitar-access-${student.id}`}
-                      className="checkbox"
                       checked={guitarAccess[student.id] || false}
                       disabled={!isEditing}
                       onChange={async () => {
-                        // Toggle guitar access in local state
                         const newGuitarAccess = !guitarAccess[student.id];
                         setGuitarAccess((prev) => ({
                           ...prev,
                           [student.id]: newGuitarAccess,
                         }));
-
-                        // Update guitarAccess in Firestore
                         const studentDocRef = doc(db, "users", student.id);
                         try {
                           await updateDoc(studentDocRef, {
@@ -234,12 +224,12 @@ const AdminAccount = () => {
                         }
                       }}
                     />
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </div>
     </div>
   );

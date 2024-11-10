@@ -6,18 +6,31 @@ import GitareIcon from "../../assets/icon/gitare-icon.svg";
 import Microphone from "../../assets/icon/microphone-icon.svg";
 import User from "../../assets/icon/user-icon.svg";
 import { Button } from "../../components/ui/button";
+import { getAuth } from "firebase/auth";
+import { useNavigate } from "react-router-dom";
 
 const Account = () => {
   const [fullName, setFullName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [isEditing, setIsEditing] = useState(false);
-  const [loading, setLoading] = useState(true); // Loading state
+  const [loading, setLoading] = useState(true);
   const [userUid, setUserUid] = useState<string | null>(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const auth = getAuth();
+    const user = auth.currentUser;
+
+    if (user) {
+      setUserUid(user.uid); // Set user UID if logged in
+    } else {
+      navigate("/login"); // Redirect to login if no user is logged in
+    }
+  }, [navigate]);
 
   useEffect(() => {
     const fetchUserData = async () => {
       if (userUid) {
-        // Ensure userUid is set
         try {
           const userDoc = await getDoc(doc(db, "users", userUid));
           if (userDoc.exists()) {
@@ -30,17 +43,18 @@ const Account = () => {
         } catch (error) {
           console.error("Error loading user data:", error);
         } finally {
-          setLoading(false); // Set loading to false after data is fetched
+          setLoading(false);
         }
       }
     };
+
     fetchUserData();
   }, [userUid]);
 
   const handleSave = async () => {
     if (!userUid) {
       console.error("User UID is not set. Cannot save data.");
-      return; // Exit if userUid is not available
+      return;
     }
 
     try {
@@ -54,19 +68,19 @@ const Account = () => {
     }
   };
 
-  if (loading) return <p>Loading...</p>; // Show loading indicator
+  if (loading) return <p>Loading...</p>;
 
   return (
-    <div className="flex justify-center items-end my-[70px] bg-[--white]">
-      <div className="md:flex gap-[70px]">
-        <div className="bg-gray-300 w-[300px] h-[400px] rounded-md flex ml-24 md:ml-0 items-center justify-center mb-10">
-          <img src={User} alt="" />
+    <div className="flex justify-center items-start py-[70px] bg-[--white]">
+      <div className="flex flex-col md:flex-row gap-[30px] px-4 md:px-24 w-full">
+        <div className="bg-gray-300 w-[200px] h-[250px] md:w-[300px] md:h-[400px] rounded-md flex justify-center items-center mb-6 md:mb-0">
+          <img src={User} alt="User" />
         </div>
-        <div className="flex flex-col space-y-4">
+        <div className="flex flex-col gap-4 w-full md:w-[500px]">
           <div>
             <Input
               type="text"
-              className="rounded-md h-12 text-lg bg-[--light-blue] w-[500px] p-2 mb-4"
+              className="rounded-md h-12 text-lg bg-[--light-blue] w-full p-2 mb-4"
               placeholder="ФИО"
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
@@ -76,7 +90,7 @@ const Account = () => {
           <div>
             <Input
               type="text"
-              className="rounded-md h-12 text-lg bg-[--light-blue] w-[500px] p-2 mb-6"
+              className="rounded-md h-12 text-lg bg-[--light-blue] w-full p-2 mb-6"
               placeholder="Номер:"
               value={phoneNumber}
               onChange={(e) => setPhoneNumber(e.target.value)}
@@ -84,17 +98,20 @@ const Account = () => {
             />
           </div>
           {isEditing ? (
-            <Button onClick={handleSave} className=" text-white">
+            <Button onClick={handleSave} className="text-white w-full">
               Сохранить данные аккаунта
             </Button>
           ) : (
-            <Button onClick={() => setIsEditing(true)} className="text-white">
+            <Button
+              onClick={() => setIsEditing(true)}
+              className="text-white w-full"
+            >
               Редактировать данные аккаунта
             </Button>
           )}
-          <div className="text-center">
+          <div className="text-center mt-6">
             <p className="text-[--brown] text-xl mb-3">Доступ к курсам</p>
-            <div className="flex justify-center gap-7">
+            <div className="flex justify-center gap-6">
               <div className="relative flex items-center bg-gray-300 text-gray-700 py-2 px-4 rounded-lg">
                 <img
                   src={Microphone}
@@ -117,7 +134,6 @@ const Account = () => {
               </div>
             </div>
           </div>
-          <div className="flex justify-end gap-2"></div>
         </div>
       </div>
     </div>
