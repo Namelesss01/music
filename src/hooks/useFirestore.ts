@@ -8,19 +8,19 @@ import {
 } from "firebase/firestore";
 import { db } from "../firebase/config";
 
-export const useFirestore = (collectionName: any) => {
-  let ref = collection(db, collectionName) as any;
+export const useFirestore = (collectionName: string) => {
+  const ref = collection(db, collectionName);
 
-  const addDocument = async (doc: any) => {
+  const addDocument = async (docData: Record<string, any>) => {
     try {
       const createdAt = Timestamp.fromDate(new Date());
-      await addDoc(ref, { ...doc, createdAt });
-    } catch (err:any) {
+      await addDoc(ref, { ...docData, createdAt });
+    } catch (err: any) {
       console.log(err.message);
     }
   };
 
-  const deleteDocument = async (id: number) => {
+  const deleteDocument = async (id: string) => {
     try {
       const docRef = doc(db, collectionName, id);
       await deleteDoc(docRef);
@@ -29,10 +29,10 @@ export const useFirestore = (collectionName: any) => {
     }
   };
 
-  const updateDocument = async (id: number, updates: any) => {
+  const updateDocument = async (id: string, updates: Record<string, any>) => {
     try {
-      const ref = doc(db, collectionName, id);
-      await updateDoc(ref, updates);
+      const docRef = doc(db, collectionName, id);
+      await updateDoc(docRef, updates);
 
       return updates;
     } catch (err: any) {

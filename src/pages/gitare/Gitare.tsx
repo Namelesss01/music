@@ -14,7 +14,8 @@ import {
 const ITEMS_PER_PAGE = 12;
 
 const Gitare = () => {
-  const { documents: videos } = useCollection("files", null, null);
+  const { documents: videos } = useCollection("files", undefined, undefined);
+
   const [currentPage, setCurrentPage] = useState(1);
 
   // Filter only videos with the "guitar" category

@@ -245,14 +245,14 @@ export function Auth(props: LayoutProps) {
                   <Button
                     className="w-1/2"
                     onClick={() => setUserType("admin")}
-                    variant={userType === "admin" ? "solid" : "outline"}
+                    variant={userType === "admin" ? "outline" : "secondary"} // Используем 'outline' и 'secondary' вместо 'solid'
                   >
                     Админ
                   </Button>
                   <Button
                     className="w-1/2"
                     onClick={() => setUserType("student")}
-                    variant={userType === "student" ? "solid" : "outline"}
+                    variant={userType === "student" ? "outline" : "secondary"} // Используем 'outline' и 'secondary' вместо 'solid'
                   >
                     Студент
                   </Button>

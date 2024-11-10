@@ -16,7 +16,7 @@ import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { addDoc, collection, Timestamp } from "firebase/firestore";
 
 const AddFile = () => {
-  const [file, setFile] = useState(null);
+  const [file, setFile] = useState<File | null>(null);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [destination, setDestination] = useState("");
@@ -25,8 +25,8 @@ const AddFile = () => {
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [uploadSuccess, setUploadSuccess] = useState(false);
 
-  const handleFileChange = (e) => {
-    setFile(e.target.files[0]);
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFile(e.target.files ? e.target.files[0] : null);
   };
 
   const handleAddClick = () => {
@@ -108,30 +108,30 @@ const AddFile = () => {
             onChange={(e) => setName(e.target.value)}
             className="rounded-lg bg-[--light-blue] px-3 mb-8"
           />
-          <Select
-            onValueChange={(value) => setCategory(value)}
-            className="rounded-lg mb-8"
-          >
-            <SelectTrigger className="bg-[--light-blue] text-black px-3 py-2 rounded-lg border border-gray-300">
-              <SelectValue placeholder="Выберите категорию" />
-            </SelectTrigger>
-            <SelectContent className="bg-white border border-gray-300 rounded-lg mt-1 shadow-lg">
-              <SelectGroup>
-                <SelectItem
-                  value="vocals"
-                  className="px-4 py-2 hover:bg-[--light-blue] cursor-pointer"
-                >
-                  Vocals
-                </SelectItem>
-                <SelectItem
-                  value="guitar"
-                  className="px-4 py-2 hover:bg-[--light-blue] cursor-pointer"
-                >
-                  Guitar
-                </SelectItem>
-              </SelectGroup>
-            </SelectContent>
-          </Select>
+          <div className="rounded-lg mb-8">
+            <Select onValueChange={(value) => setCategory(value)}>
+              <SelectTrigger className="bg-[--light-blue] text-black px-3 py-2 rounded-lg border border-gray-300">
+                <SelectValue placeholder="Выберите категорию" />
+              </SelectTrigger>
+              <SelectContent className="bg-white border border-gray-300 rounded-lg mt-1 shadow-lg">
+                <SelectGroup>
+                  <SelectItem
+                    value="vocals"
+                    className="px-4 py-2 hover:bg-[--light-blue] cursor-pointer"
+                  >
+                    Vocals
+                  </SelectItem>
+                  <SelectItem
+                    value="guitar"
+                    className="px-4 py-2 hover:bg-[--light-blue] cursor-pointer"
+                  >
+                    Guitar
+                  </SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </div>
+
           <Textarea
             placeholder="Краткое описание"
             value={description}
@@ -143,7 +143,6 @@ const AddFile = () => {
           </div>
         </div>
       </form>
-
       {/* Confirmation Popup */}
       {showConfirmation && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
@@ -162,7 +161,6 @@ const AddFile = () => {
           </div>
         </div>
       )}
-
       {/* Loading Spinner */}
       {isLoading && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
@@ -172,7 +170,6 @@ const AddFile = () => {
           </div>
         </div>
       )}
-
       {/* Success Message */}
       {uploadSuccess && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">

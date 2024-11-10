@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { auth, db } from '../firebase/config';
 import { doc, updateDoc } from 'firebase/firestore';
 import { useDispatch } from 'react-redux';
-import { setUser } from '@/features/user/userSlice';
+import { setUser } from '../features/user/userSlice';
 
 export const useLogout = () => {
   const [error, setError] = useState(null);

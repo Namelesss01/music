@@ -9,7 +9,7 @@ import { auth } from "../../firebase/config";
 import { useState } from "react"; // Импортируем useState
 
 const Header = () => {
-  const { isLoggedIn, userType, isCheckingStatus } = useAuthStatus();
+  const { isLoggedIn, userType } = useAuthStatus(); // убрали isCheckingStatus
   const navigate = useNavigate();
 
   // Состояние для бургер-меню
@@ -43,7 +43,7 @@ const Header = () => {
   };
 
   // Обработчик клика по ссылке
-  const handleLinkClick = (label) => {
+  const handleLinkClick = (label: string) => {
     if (label === "Контакты") {
       scrollToFooter(); // Плавная прокрутка к футеру
     }
@@ -90,39 +90,37 @@ const Header = () => {
           </div>
 
           {/* Иконки пользователя и выхода */}
-          {!isCheckingStatus && (
-            <div className="flex items-center space-x-4">
-              {isLoggedIn ? (
-                <>
-                  {userType === "admin" ? (
-                    <button
-                      onClick={handleUserClick}
-                      className="font-medium text-base text-[#999999]"
-                    >
-                      <User className="text-blue-500 w-8 h-8 cursor-pointer" />
-                    </button>
-                  ) : (
-                    <button
-                      onClick={handleUserClick}
-                      className="font-medium text-base text-[#999999]"
-                    >
-                      <User className="text-green-500 w-8 h-8 cursor-pointer" />
-                    </button>
-                  )}
+          <div className="flex items-center space-x-4">
+            {isLoggedIn ? (
+              <>
+                {userType === "admin" ? (
                   <button
-                    onClick={handleLogout}
+                    onClick={handleUserClick}
                     className="font-medium text-base text-[#999999]"
                   >
-                    <LogOut className="text-[--white] w-8 h-8 cursor-pointer" />
+                    <User className="text-blue-500 w-8 h-8 cursor-pointer" />
                   </button>
-                </>
-              ) : (
-                <Auth>
-                  <User className="text-[--white] w-8 h-8 cursor-pointer" />
-                </Auth>
-              )}
-            </div>
-          )}
+                ) : (
+                  <button
+                    onClick={handleUserClick}
+                    className="font-medium text-base text-[#999999]"
+                  >
+                    <User className="text-green-500 w-8 h-8 cursor-pointer" />
+                  </button>
+                )}
+                <button
+                  onClick={handleLogout}
+                  className="font-medium text-base text-[#999999]"
+                >
+                  <LogOut className="text-[--white] w-8 h-8 cursor-pointer" />
+                </button>
+              </>
+            ) : (
+              <Auth>
+                <User className="text-[--white] w-8 h-8 cursor-pointer" />
+              </Auth>
+            )}
+          </div>
         </div>
       </div>
 

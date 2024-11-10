@@ -23,12 +23,12 @@ import {
   CarouselPrevious,
 } from "../../components/ui/carousel";
 import { Link } from "react-router-dom";
+import { FormEvent } from "react";
 
 const Main = () => {
-  const formRef = useRef(null); // Создаем реф для формы
+  const formRef = useRef<HTMLDivElement>(null); // Указываем тип HTMLDivElement
 
   const handleScrollToForm = () => {
-    // При клике на кнопку прокручиваем страницу к форме
     formRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
@@ -60,7 +60,7 @@ const Main = () => {
   };
 
   // Обработчик отправки формы
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
 
