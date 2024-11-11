@@ -4,7 +4,7 @@ import {
 } from "firebase/auth";
 import { useState } from "react";
 import { auth, db } from "../firebase/config";
-import { doc } from "firebase/firestore";
+import { getDoc, doc } from "firebase/firestore";
 import { useDispatch } from "react-redux";
 import { setUser } from "../features/user/userSlice";
 
@@ -28,7 +28,16 @@ export const useLogin = () => {
       const response = await signInWithEmailAndPassword(auth, email, password);
       if (response) {
         const userDoc = doc(db, "users", response.user.uid);
-        dispatch(setUser(response.user));
+        const userSnapshot = await getDoc(userDoc);
+
+        if (userSnapshot.exists()) {
+          const userData = userSnapshot.data();
+          dispatch(setUser({ ...response.user, ...userData })); // Merge user data from Firestore
+        } else {
+          console.warn("User document does not exist!");
+          dispatch(setUser(response.user)); // Fallback if no additional user data exists
+        }
+
         return response;
       } else {
         setError("Не удалось войти");

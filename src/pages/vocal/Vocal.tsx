@@ -3,7 +3,6 @@ import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { db } from "../../firebase/config";
 import Vocals from "@/assets/img/vocal.jpg";
 import { Link } from "react-router-dom";
-import Play from "@/assets/icon/play.svg";
 import {
   Pagination,
   PaginationContent,
@@ -71,7 +70,7 @@ const Vocal = () => {
       </h2>
 
       <div className="sm:flex flex-wrap justify-start gap-6">
-        {currentVideos.map((video, index) => (
+        {currentVideos.map((video, _index) => (
           <div key={video.id} className="w-full md:w-[calc(33.333%-16px)] p-4">
             <Link to={`/videos/${video.id}`}>
               <img
@@ -106,23 +105,24 @@ const Vocal = () => {
                 className="text-white bg-[--light-blue] py-2 px-4 rounded-md hover:bg-[--dark-blue] transition-colors hover:text-white"
               />
             </PaginationItem>
-            {[...Array(totalPages).keys()].map((_, index) => (
-              <PaginationItem key={index + 1}>
+            {[...Array(totalPages).keys()].map((_, _index) => (
+              <PaginationItem key={_index + 1}>
                 <PaginationLink
                   href="#"
-                  isActive={currentPage === index + 1}
-                  onClick={() => changePage(index + 1)}
-                  size="default" // Changed to "default"
+                  isActive={currentPage === _index + 1}
+                  onClick={() => changePage(_index + 1)}
+                  size="default"
                   className={`py-2 px-4 rounded-md transition-colors ${
-                    currentPage === index + 1
+                    currentPage === _index + 1
                       ? "bg-[--light-blue] text-white"
                       : "text-black bg-[--white] hover:bg-[--light-blue] hover:text-white"
                   }`}
                 >
-                  {index + 1}
+                  {_index + 1}
                 </PaginationLink>
               </PaginationItem>
             ))}
+
             <PaginationItem>
               <PaginationNext
                 href="#"

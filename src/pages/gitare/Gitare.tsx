@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useCollection } from "../../hooks/useCollection";
 import Gitar from "../../assets/img/gitar.jpg";
 import { Link } from "react-router-dom";
@@ -49,7 +49,7 @@ const Gitare = () => {
       </h2>
 
       <div className="md:flex flex-wrap justify-end gap-6">
-        {currentVideos.map((video, index) => (
+        {currentVideos.map((video, _index) => (
           <div key={video.id} className="w-full md:w-[calc(33.333%-16px)] p-4">
             <Link to={`/videos/${video.id}`}>
               <img

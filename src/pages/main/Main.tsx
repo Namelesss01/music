@@ -129,7 +129,10 @@ const Main = () => {
               "https://avatars.mds.yandex.net/i?id=9c0c7e3cfb343bd161dc1169947b49ec_l-4766454-images-thumbs&n=13",
               "https://avatars.mds.yandex.net/i?id=9c0c7e3cfb343bd161dc1169947b49ec_l-4766454-images-thumbs&n=13",
             ].map((url, index) => (
-              <CarouselItem key={index}>
+              <CarouselItem
+                key={index}
+                className={index === currentIndex }
+              >
                 <div className="p-1 flex relative">
                   <img
                     src={url}
@@ -146,8 +149,8 @@ const Main = () => {
             ))}
           </CarouselContent>
           <div className="flex justify-between w-full absolute bottom-1 transform -translate-y-1/2">
-            <CarouselPrevious />
-            <CarouselNext />
+            <CarouselPrevious onClick={goToPrevious} />
+            <CarouselNext onClick={goToNext} />
           </div>
         </Carousel>
       </div>
