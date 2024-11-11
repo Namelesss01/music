@@ -4,7 +4,7 @@ import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { Input } from "../../components/ui/input";
 import GitareIcon from "../../assets/icon/gitare-icon.svg";
 import Microphone from "../../assets/icon/microphone-icon.svg";
-import User from "../../assets/icon/User-icon.svg";
+import User from "../../assets/icon/user-icon.svg";
 import { Button } from "../../components/ui/button";
 import { getAuth } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
