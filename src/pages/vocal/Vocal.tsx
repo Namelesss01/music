@@ -102,7 +102,7 @@ const Vocal = () => {
               <PaginationPrevious
                 href="#"
                 onClick={() => changePage(currentPage - 1)}
-                size="md"
+                size="default" // Changed to "default"
                 className="text-white bg-[--light-blue] py-2 px-4 rounded-md hover:bg-[--dark-blue] transition-colors hover:text-white"
               />
             </PaginationItem>
@@ -112,7 +112,7 @@ const Vocal = () => {
                   href="#"
                   isActive={currentPage === index + 1}
                   onClick={() => changePage(index + 1)}
-                  size="md"
+                  size="default" // Changed to "default"
                   className={`py-2 px-4 rounded-md transition-colors ${
                     currentPage === index + 1
                       ? "bg-[--light-blue] text-white"
@@ -127,7 +127,7 @@ const Vocal = () => {
               <PaginationNext
                 href="#"
                 onClick={() => changePage(currentPage + 1)}
-                size="md"
+                size="default" // Changed to "default"
                 className="text-white bg-[--light-blue] py-2 px-4 rounded-md hover:bg-[--dark-blue] transition-colors hover:text-white"
               />
             </PaginationItem>

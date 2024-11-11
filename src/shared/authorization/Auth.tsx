@@ -1,11 +1,5 @@
 import { Button } from "../../components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardFooter,
-} from "../../components/ui/card";
+import { Card, CardContent, CardFooter } from "../../components/ui/card";
 import { Checkbox } from "../../components/ui/checkbox";
 import {
   Dialog,
@@ -27,8 +21,7 @@ import { useLogin } from "../../hooks/useLogin";
 import Spinner from "../../components/ui/spinner";
 import { useNavigate } from "react-router-dom";
 import { db } from "../../firebase/config";
-import { setDoc, doc } from "firebase/firestore"; // Import setDoc and doc
-import { getDoc } from "firebase/firestore";
+import { setDoc, doc, getDoc } from "firebase/firestore"; // Import setDoc, doc, and getDoc
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -113,6 +106,7 @@ export function Auth(props: LayoutProps) {
 
       await setDoc(doc(db, "users", res.user.uid), userData);
       handleClose();
+      console.log(userUid);
     }
     setIsLoading(false);
   };
