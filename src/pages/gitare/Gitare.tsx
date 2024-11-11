@@ -80,7 +80,7 @@ const Gitare = () => {
               <PaginationPrevious
                 href="#"
                 onClick={() => changePage(currentPage - 1)}
-                size="md"
+                size="default" // Changed to "default" (valid size)
                 className="text-white bg-[--light-blue] py-2 px-4 rounded-md hover:bg-[--dark-blue] transition-colors hover:text-white"
               />
             </PaginationItem>
@@ -90,7 +90,7 @@ const Gitare = () => {
                   href="#"
                   isActive={currentPage === index + 1}
                   onClick={() => changePage(index + 1)}
-                  size="md"
+                  size="default" // Changed to "default" (valid size)
                   className={`py-2 px-4 rounded-md transition-colors ${
                     currentPage === index + 1
                       ? "bg-[--light-blue] text-white"
@@ -105,7 +105,7 @@ const Gitare = () => {
               <PaginationNext
                 href="#"
                 onClick={() => changePage(currentPage + 1)}
-                size="md"
+                size="default" // Changed to "default" (valid size)
                 className="text-white bg-[--light-blue] py-2 px-4 rounded-md hover:bg-[--dark-blue] transition-colors hover:text-white"
               />
             </PaginationItem>
