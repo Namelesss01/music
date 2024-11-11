@@ -22,7 +22,7 @@ const Account = () => {
     const user = auth.currentUser;
 
     if (user) {
-      setUserUid(user.uid); // Set user UID if logged in
+      setUserUid(user.uid); 
     } else {
       navigate("/login"); // Redirect to login if no user is logged in
     }
