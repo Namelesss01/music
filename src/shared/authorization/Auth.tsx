@@ -40,7 +40,7 @@ interface UserData {
 
 export function Auth(props: LayoutProps) {
   const dialogRef = useRef<HTMLDivElement | null>(null);
-  const [userUid, setUserUid] = useState<string | null>(null);
+  const [_userUid, setUserUid] = useState<string | null>(null);
   const [displayName, setDisplayName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -106,7 +106,6 @@ export function Auth(props: LayoutProps) {
 
       await setDoc(doc(db, "users", res.user.uid), userData);
       handleClose();
-      console.log(userUid);
     }
     setIsLoading(false);
   };
