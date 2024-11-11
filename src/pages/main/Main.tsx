@@ -131,7 +131,7 @@ const Main = () => {
             ].map((url, index) => (
               <CarouselItem
                 key={index}
-                className={index === currentIndex }
+                className={index === currentIndex ? "active" : ""} // Apply "active" class if current index matches
               >
                 <div className="p-1 flex relative">
                   <img
