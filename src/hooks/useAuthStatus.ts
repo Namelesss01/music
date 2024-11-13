@@ -1,27 +1,43 @@
+// useAuthStatus hook
 import { useState, useEffect } from "react";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth, db } from "../firebase/config";
+import { doc, getDoc } from "firebase/firestore";
 
 export const useAuthStatus = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userType, setUserType] = useState<string | null>(null);
-  const [isCheckingStatus, setIsCheckingStatus] = useState(true); // добавлено
+  const [userType, setUserType] = useState<string | null>(null); // Can be 'admin', 'student', etc.
+  const [userUid, setUserUid] = useState<string | null>(null); // Track user UID
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const auth = getAuth();
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
-        setIsLoggedIn(true);
-        // здесь логика для получения userType
-        setUserType(user.email?.includes("admin") ? "admin" : "user"); // пример
+        try {
+          const userRef = doc(db, "users", user.uid);
+          const userSnap = await getDoc(userRef);
+
+          if (userSnap.exists()) {
+            const userData = userSnap.data();
+            setUserType(userData?.userType);
+            setUserUid(user.uid);
+            setIsLoggedIn(true);
+          } else {
+            console.error("User document not found for UID:", user.uid);
+            setIsLoggedIn(false);
+          }
+        } catch (error) {
+          console.error("Error fetching user data:", error);
+          setIsLoggedIn(false);
+        }
       } else {
         setIsLoggedIn(false);
-        setUserType(null);
       }
-      setIsCheckingStatus(false); // после проверки статуса обновляем флаг
+      setLoading(false);
     });
 
     return () => unsubscribe();
   }, []);
 
-  return { isLoggedIn, userType, isCheckingStatus }; // теперь isCheckingStatus возвращается
+  return { isLoggedIn, userType, userUid, loading };
 };

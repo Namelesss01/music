@@ -13,6 +13,8 @@ import { Input } from "../../components/ui/input";
 import { Textarea } from "../../components/ui/textarea";
 import User from "../../assets/icon/user.svg";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+
 import {
   Table,
   TableBody,
@@ -24,6 +26,7 @@ import {
 } from "../../components/ui/table";
 import { Button } from "../../components/ui/button";
 import { getAuth } from "firebase/auth";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 interface Student {
   id: string;
@@ -41,12 +44,36 @@ const AdminAccount = () => {
   const [fullName, setFullName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [info, setInfo] = useState("");
+  const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [loading, setLoading] = useState(true); // Track loading state
 
   const auth = getAuth();
   const user = auth.currentUser;
-  const userUid = user ? user.uid : null; // Ensure userUid is defined
+  const userUid = user ? user.uid : null;
+  const navigate = useNavigate();
 
   useEffect(() => {
+    if (!user) {
+      console.error("User not authenticated");
+      navigate("/login"); // Redirect to login if not authenticated
+      return;
+    }
+
+    const fetchAccountInfo = async () => {
+      const userDocRef = doc(db, "users", user.uid);
+      const userSnap = await getDoc(userDocRef);
+      if (userSnap.exists()) {
+        const userData = userSnap.data();
+        setFullName(userData.fullName || "");
+        setPhoneNumber(userData.phoneNumber || "");
+        setInfo(userData.info || "");
+        setProfileImage(userData.profileImage || null);
+      }
+    };
+
+    fetchAccountInfo();
+
     const studentQuery = query(
       collection(db, "users"),
       where("userType", "==", "student")
@@ -68,10 +95,11 @@ const AdminAccount = () => {
       });
       setVocalAccess(vocalState);
       setGuitarAccess(guitarState);
+      setLoading(false); // Set loading to false once the data is fetched
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [userUid, navigate]);
 
   const handleEdit = () => {
     setIsEditing(true);
@@ -88,6 +116,7 @@ const AdminAccount = () => {
 
     await Promise.all(updates);
     setIsEditing(false);
+    setIsAccountEditing(false);
   };
 
   const toggleAccountEdit = () => {
@@ -97,21 +126,23 @@ const AdminAccount = () => {
   const updateAccountInfo = async () => {
     if (userUid) {
       try {
-        // Get the user document reference
         const userDocRef = doc(db, "users", userUid);
 
-        // Get the current document data (if needed)
-        const userSnap = await getDoc(userDocRef);
-
-        if (userSnap.exists()) {
-          // Update the user info with the new values
-          await updateDoc(userDocRef, {
-            fullName,
-            phoneNumber,
-            info,
-          });
-          alert("Данные аккаунта обновлены успешно!");
+        let profileImageUrl = profileImage;
+        if (imageFile) {
+          const storage = getStorage();
+          const storageRef = ref(storage, `profileImages/${userUid}`);
+          await uploadBytes(storageRef, imageFile);
+          profileImageUrl = await getDownloadURL(storageRef);
         }
+
+        await updateDoc(userDocRef, {
+          fullName,
+          phoneNumber,
+          info,
+          profileImage: profileImageUrl,
+        });
+        alert("Данные аккаунта обновлены успешно!");
       } catch (error) {
         console.error("Error updating account info:", error);
       }
@@ -120,12 +151,47 @@ const AdminAccount = () => {
     }
   };
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files ? e.target.files[0] : null;
+    if (file) {
+      setImageFile(file);
+      const storage = getStorage();
+      const storageRef = ref(storage, `profileImages/${userUid}`);
+
+      uploadBytes(storageRef, file).then((snapshot) => {
+        getDownloadURL(snapshot.ref).then((downloadURL) => {
+          setProfileImage(downloadURL);
+        });
+      });
+    }
+  };
+
+  if (loading) {
+    return <div>Loading...</div>; // Show loading state until data is fetched
+  }
   return (
     <div className="p-4 md:p-8">
-      {/* Profile Section */}
       <div className="flex flex-col md:flex-row justify-center items-start md:items-end gap-8 bg-white p-6 rounded-lg">
-        <div className="bg-gray-300 w-full md:w-[300px] h-[300px] md:h-[400px] rounded-md flex items-center justify-center mb-4 md:mb-0">
-          <img src={User} alt="User Icon" />
+        <div className="relative">
+          <div
+            className={`bg-gray-300 w-full md:w-[300px] h-[300px] md:h-[400px] rounded-md flex items-center justify-center mb-4 md:mb-0 cursor-pointer ${
+              isAccountEditing ? "" : "cursor-not-allowed"
+            }`}
+            onClick={() =>
+              isAccountEditing
+                ? document.getElementById("imageInput")?.click()
+                : null
+            }
+          >
+            <img src={profileImage || User} alt="User Icon" className="" />
+          </div>
+          <input
+            id="imageInput"
+            type="file"
+            accept="image/*"
+            onChange={handleImageChange}
+            className="hidden"
+          />
         </div>
 
         <div className="flex flex-col w-full md:w-[500px] space-y-4">
@@ -157,7 +223,7 @@ const AdminAccount = () => {
               Сохранить данные аккаунта
             </Button>
           ) : (
-            <Button onClick={toggleAccountEdit}>
+            <Button onClick={() => setIsAccountEditing(true)}>
               Редактировать данные аккаунта
             </Button>
           )}
@@ -167,7 +233,6 @@ const AdminAccount = () => {
         </div>
       </div>
 
-      {/* Students Table Section */}
       <div className="my-10">
         <p className="text-4xl text-center mb-6">
           Список учеников и доступ к урокам
@@ -202,19 +267,11 @@ const AdminAccount = () => {
                       checked={vocalAccess[student.id] || false}
                       disabled={!isEditing}
                       onChange={async () => {
-                        const newVocalAccess = !vocalAccess[student.id];
-                        setVocalAccess((prev) => ({
-                          ...prev,
-                          [student.id]: newVocalAccess,
-                        }));
-                        const studentDocRef = doc(db, "users", student.id);
-                        try {
-                          await updateDoc(studentDocRef, {
-                            vocalAccess: newVocalAccess,
-                          });
-                        } catch (error) {
-                          console.error("Error updating vocal access:", error);
-                        }
+                        const newAccess = !vocalAccess[student.id];
+                        setVocalAccess({
+                          ...vocalAccess,
+                          [student.id]: newAccess,
+                        });
                       }}
                     />
                   </TableCell>
@@ -224,19 +281,11 @@ const AdminAccount = () => {
                       checked={guitarAccess[student.id] || false}
                       disabled={!isEditing}
                       onChange={async () => {
-                        const newGuitarAccess = !guitarAccess[student.id];
-                        setGuitarAccess((prev) => ({
-                          ...prev,
-                          [student.id]: newGuitarAccess,
-                        }));
-                        const studentDocRef = doc(db, "users", student.id);
-                        try {
-                          await updateDoc(studentDocRef, {
-                            guitarAccess: newGuitarAccess,
-                          });
-                        } catch (error) {
-                          console.error("Error updating guitar access:", error);
-                        }
+                        const newAccess = !guitarAccess[student.id];
+                        setGuitarAccess({
+                          ...guitarAccess,
+                          [student.id]: newAccess,
+                        });
                       }}
                     />
                   </TableCell>

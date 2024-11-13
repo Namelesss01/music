@@ -1,4 +1,8 @@
-import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  updateProfile,
+  getAuth,
+} from "firebase/auth";
 import { useState } from "react";
 import { auth, db } from "../firebase/config";
 import { doc, setDoc } from "firebase/firestore";
@@ -16,8 +20,7 @@ export const useSignup = () => {
   const [error, setError] = useState<string | null>(null);
   const [isPending, setIsPending] = useState<boolean>(false);
   const dispatch = useDispatch();
-
-  
+  const auth = getAuth();
 
   const signup = async ({
     email,
