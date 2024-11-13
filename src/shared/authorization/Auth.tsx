@@ -1,3 +1,4 @@
+import { createUserWithEmailAndPassword } from "firebase/auth"; // <-- Add this import
 import { Button } from "../../components/ui/button";
 import { Card, CardContent, CardFooter } from "../../components/ui/card";
 import { Checkbox } from "../../components/ui/checkbox";
@@ -22,7 +23,7 @@ import Spinner from "../../components/ui/spinner";
 import { useNavigate } from "react-router-dom";
 import { db } from "../../firebase/config";
 import { setDoc, doc, getDoc } from "firebase/firestore"; // Import setDoc, doc, and getDoc
-
+import { getAuth } from "firebase/auth";
 interface LayoutProps {
   children: React.ReactNode;
 }
@@ -53,6 +54,7 @@ export function Auth(props: LayoutProps) {
   const { signup, error: signupError } = useSignup();
   const { login, resetPassword, error: loginError } = useLogin();
   const navigate = useNavigate();
+  const auth = getAuth(); // <-- Initialize auth
 
   const handleOpen = () => setIsOpen(true);
   const handleClose = () => {
@@ -108,6 +110,17 @@ export function Auth(props: LayoutProps) {
       handleClose();
     }
     setIsLoading(false);
+
+    try {
+      const response = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      // Success handling...
+    } catch (err: any) {
+      setError(err.message || "Something went wrong!");
+    }
   };
 
   const handlePasswordReset = async () => {

@@ -4,7 +4,7 @@ import Vocal from "./pages/vocal/Vocal";
 import Main from "./pages/main/Main";
 import Header from "./shared/header/Header";
 import Footer from "./shared/footer/Footer";
-import { Route, Routes, Navigate } from "react-router-dom"; // Removed Switch
+import { Route, Routes, Navigate } from "react-router-dom";
 import VideoPage from "./pages/video_page/VideoPage";
 import AddFile from "./pages/add_file/AddFile";
 import Account from "./pages/account/Account";
@@ -18,9 +18,34 @@ function App() {
         <Header />
         <Routes>
           <Route path="/main" element={<Main />} />
-          <Route path="/gitare" element={<Gitare />} />
-          <Route path="/vocal" element={<Vocal />} />
-          {/* Оберните VideoPage в ProtectedRoute */}
+
+          {/* Gitare Page - Only accessible to students with gitareAccess or admins */}
+          <Route
+            path="/gitare"
+            element={
+              <ProtectedRoute
+                allowedUserType="student"
+                requiredAccess="GitareAccess"
+              >
+                <Gitare />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Vocal Page - Only accessible to students with vocalAccess or admins */}
+          <Route
+            path="/vocal"
+            element={
+              <ProtectedRoute
+                allowedUserType="student"
+                requiredAccess="VocalAccess"
+              >
+                <Vocal />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Video Page - Only accessible to admins */}
           <Route
             path="/videos/:id"
             element={
@@ -29,12 +54,29 @@ function App() {
               </ProtectedRoute>
             }
           />
+
           <Route path="/add-file" element={<AddFile />} />
-          <Route path="/account" element={<Account />} />
-          <Route path="/account-admin" element={<AdminAccount />} />
+
+          {/* Account Pages */}
+          <Route
+            path="/account"
+            element={
+              <ProtectedRoute allowedUserType="student">
+                <Account />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/account-admin"
+            element={
+              <ProtectedRoute allowedUserType="admin">
+                <AdminAccount />
+              </ProtectedRoute>
+            }
+          />
+
           <Route path="*" element={<Navigate to="/main" />} />
         </Routes>
-
         <Footer />
       </div>
     </>
