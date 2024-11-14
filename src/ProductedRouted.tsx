@@ -37,7 +37,10 @@ const ProtectedRoute = ({
     }
   }
 
-  
+  // Prevent students from accessing /account-admin
+  if (allowedUserType === "admin" && userType === "student") {
+    return <Navigate to="/account" />;
+  }
 
   return <>{children}</>;
 };

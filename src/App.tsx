@@ -44,6 +44,14 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/account-admin/:id"
+            element={
+              <ProtectedRoute allowedUserType="admin">
+                <AdminAccount />
+              </ProtectedRoute>
+            }
+          />
 
           {/* Video Page - Only accessible to admins */}
           <Route
