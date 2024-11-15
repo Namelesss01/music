@@ -178,10 +178,7 @@ export function Auth(props: LayoutProps) {
                 />
                 {loginError && <p className="text-red-500">{error}</p>}
                 <div className="flex items-center justify-between pt-4 pb-2">
-                  <div className="flex items-center gap-x-2">
-                    <Checkbox />
-                    <Label>Запомнить меня</Label>
-                  </div>
+                  <div className="flex items-center gap-x-2"></div>
                   <a
                     onClick={handlePasswordReset}
                     className="text-blue-500 cursor-pointer"
