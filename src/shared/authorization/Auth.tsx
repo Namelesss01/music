@@ -1,4 +1,3 @@
-import { createUserWithEmailAndPassword } from "firebase/auth"; // <-- Add this import
 import { Button } from "../../components/ui/button";
 import { Card, CardContent, CardFooter } from "../../components/ui/card";
 import { Checkbox } from "../../components/ui/checkbox";
@@ -23,7 +22,7 @@ import Spinner from "../../components/ui/spinner";
 import { useNavigate } from "react-router-dom";
 import { db } from "../../firebase/config";
 import { setDoc, doc, getDoc } from "firebase/firestore"; // Import setDoc, doc, and getDoc
-import { getAuth } from "firebase/auth";
+
 interface LayoutProps {
   children: React.ReactNode;
 }
@@ -54,7 +53,6 @@ export function Auth(props: LayoutProps) {
   const { signup, error: signupError } = useSignup();
   const { login, resetPassword, error: loginError } = useLogin();
   const navigate = useNavigate();
-  const auth = getAuth(); // <-- Initialize auth
 
   const handleOpen = () => setIsOpen(true);
   const handleClose = () => {
@@ -110,17 +108,6 @@ export function Auth(props: LayoutProps) {
       handleClose();
     }
     setIsLoading(false);
-
-    try {
-      const response = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
-      // Success handling...
-    } catch (err: any) {
-      setError(err.message || "Something went wrong!");
-    }
   };
 
   const handlePasswordReset = async () => {
@@ -226,13 +213,7 @@ export function Auth(props: LayoutProps) {
                   type="text"
                   className="border rounded-md p-2 w-full mt-6"
                 />
-                <Input
-                  onChange={(e) => setDisplayName(e.target.value)}
-                  id="displayName"
-                  placeholder="Имя пользователя"
-                  type="text"
-                  className="border rounded-md p-2 w-full"
-                />
+
                 <Input
                   onChange={(e) => setEmail(e.target.value)}
                   id="email"
@@ -247,18 +228,24 @@ export function Auth(props: LayoutProps) {
                   type="password"
                   className="border rounded-md p-2 w-full"
                 />
-                <div className="flex justify-between">
+                <div className="flex justify-between gap-2">
                   <Button
-                    className="w-1/2"
+                    className={`w-1/2 ${
+                      userType === "admin"
+                        ? "bg-[--dark-blue] text-white"
+                        : "bg-gray-200"
+                    }`}
                     onClick={() => setUserType("admin")}
-                    variant={userType === "admin" ? "outline" : "secondary"} // Используем 'outline' и 'secondary' вместо 'solid'
                   >
                     Админ
                   </Button>
                   <Button
-                    className="w-1/2"
+                    className={`w-1/2 ${
+                      userType === "student"
+                        ? "bg-[--dark-blue] text-white"
+                        : "bg-gray-200"
+                    }`}
                     onClick={() => setUserType("student")}
-                    variant={userType === "student" ? "outline" : "secondary"} // Используем 'outline' и 'secondary' вместо 'solid'
                   >
                     Студент
                   </Button>

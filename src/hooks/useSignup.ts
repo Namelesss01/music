@@ -4,7 +4,7 @@ import {
   getAuth,
 } from "firebase/auth";
 import { useState } from "react";
-import { auth, db } from "../firebase/config";
+import { db } from "../firebase/config";
 import { doc, setDoc } from "firebase/firestore";
 import { useDispatch } from "react-redux";
 import { setUser } from "../features/user/userSlice";
