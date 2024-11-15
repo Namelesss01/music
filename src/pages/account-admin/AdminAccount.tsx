@@ -46,7 +46,7 @@ const AdminAccount = () => {
   const [info, setInfo] = useState("");
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
-  const [loading, setLoading] = useState(true); // Track loading state
+  const [loading, setLoading] = useState(true);
 
   const auth = getAuth();
   const user = auth.currentUser;
@@ -55,7 +55,7 @@ const AdminAccount = () => {
     ? user.email === "admin@example.com"
       ? "admin"
       : "student"
-    : null; // Set user type based on email (or a different method)
+    : null;
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -100,7 +100,7 @@ const AdminAccount = () => {
       });
       setVocalAccess(vocalState);
       setGuitarAccess(guitarState);
-      setLoading(false); // Set loading to false once the data is fetched
+      setLoading(false);
     });
 
     return () => unsubscribe();
@@ -126,12 +126,13 @@ const AdminAccount = () => {
 
   const navigateToAccount = (studentId: string) => {
     if (userType === "admin") {
-      navigate(`/account-admin/${studentId}`); // Admin can go to student account
+      navigate(`/account-admin/${studentId}`);
     } else {
-      navigate("/account"); // Redirect student to their own account
+      navigate("/account");
     }
   };
 
+  // Use toggleAccountEdit to toggle account editing state
   const toggleAccountEdit = () => {
     setIsAccountEditing((prev) => !prev);
   };
@@ -180,8 +181,9 @@ const AdminAccount = () => {
   };
 
   if (loading) {
-    return <div>Loading...</div>; // Show loading state until data is fetched
+    return <div>Loading...</div>;
   }
+
   return (
     <div className="p-4 md:p-8">
       <div className="flex flex-col md:flex-row justify-center items-start md:items-end gap-8 bg-white p-6 rounded-lg">
@@ -236,7 +238,7 @@ const AdminAccount = () => {
               Сохранить данные аккаунта
             </Button>
           ) : (
-            <Button onClick={() => setIsAccountEditing(true)}>
+            <Button onClick={toggleAccountEdit}>
               Редактировать данные аккаунта
             </Button>
           )}
@@ -265,7 +267,7 @@ const AdminAccount = () => {
                 <TableHead className="text-center">ФИО Учеников</TableHead>
                 <TableHead className="text-center">Вокал</TableHead>
                 <TableHead className="text-center">Гитара</TableHead>
-                <TableHead className="text-center">Редактировать</TableHead>
+                <TableHead className="text-center">Действия</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -279,26 +281,26 @@ const AdminAccount = () => {
                     <input
                       type="checkbox"
                       checked={vocalAccess[student.id]}
+                      disabled={!isEditing}
                       onChange={() =>
                         setVocalAccess((prev) => ({
                           ...prev,
                           [student.id]: !prev[student.id],
                         }))
                       }
-                      disabled={!isEditing}
                     />
                   </TableCell>
                   <TableCell className="text-center">
                     <input
                       type="checkbox"
                       checked={guitarAccess[student.id]}
+                      disabled={!isEditing}
                       onChange={() =>
                         setGuitarAccess((prev) => ({
                           ...prev,
                           [student.id]: !prev[student.id],
                         }))
                       }
-                      disabled={!isEditing}
                     />
                   </TableCell>
                   <TableCell className="text-center">
