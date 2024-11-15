@@ -104,13 +104,13 @@ const Account = () => {
   if (loading) return <p>Loading...</p>;
 
   return (
-    <div className="flex justify-center items-start py-[70px] bg-[--white] md:mx-auto">
-      <div className="flex flex-col md:flex-row gap-[30px] px-4 md:px-24 w-full">
-        <div className="relative bg-gray-300 w-[200px] h-[250px] md:w-[300px] md:h-[400px] rounded-md flex justify-center items-center mb-6 md:mb-0">
+    <div className="flex justify-center items-center bg-[--white] mx-auto min-h-screen">
+      <div className="flex flex-col md:flex-row gap-[30px] px-4 md:px-24 w-full max-w-[1200px]">
+        <div className="relative bg-gray-300 w-[300px] h-[400px] mt-[50px] mx-auto md:mx-0 md:mt-0 rounded-md flex justify-center items-center mb-6 md:mb-0">
           <img
             src={profileImageUrl || User}
             alt="User"
-            className="object-cover w-full h-full rounded-md"
+            className="object-cover object-center w-full h-full rounded-md"
           />
           {isEditing && (
             <label className="absolute bottom-2 bg-[--dark-blue] text-white py-1 px-3 rounded-md cursor-pointer">
@@ -153,7 +153,7 @@ const Account = () => {
               Редактировать данные аккаунта
             </Button>
           )}
-          <div className="text-center mt-6">
+          <div className="text-center mt-3">
             <p className="text-[--brown] text-xl mb-3">Доступ к курсам</p>
             <div className="flex md:flex-row justify-center gap-6">
               <div

@@ -187,17 +187,23 @@ const AdminAccount = () => {
     <div className="p-4 md:p-8">
       <div className="flex flex-col md:flex-row justify-center items-start md:items-end gap-8 bg-white p-6 rounded-lg">
         <div className="relative">
-          <div
-            className={`bg-gray-300 w-full md:w-[300px] h-[300px] md:h-[400px] rounded-md flex items-center justify-center mb-4 md:mb-0 cursor-pointer ${
-              isAccountEditing ? "" : "cursor-not-allowed"
-            }`}
-            onClick={() =>
-              isAccountEditing
-                ? document.getElementById("imageInput")?.click()
-                : null
-            }
-          >
-            <img src={profileImage || User} alt="User Icon" className="" />
+          <div className="relative bg-gray-300 w-[300px] h-[400px] rounded-md flex justify-center items-center mb-6 md:mb-0">
+            <img
+              src={profileImage || User}
+              alt="User"
+              className="object-cover object-center w-full h-full rounded-md"
+            />
+            {isEditing && (
+              <label className="absolute bottom-2 bg-[--dark-blue] text-white py-1 px-3 rounded-md cursor-pointer">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="hidden"
+                />
+                Загрузить фото
+              </label>
+            )}
           </div>
           <input
             id="imageInput"
@@ -266,15 +272,20 @@ const AdminAccount = () => {
                 <TableHead className="text-center">ФИО Учеников</TableHead>
                 <TableHead className="text-center">Вокал</TableHead>
                 <TableHead className="text-center">Гитара</TableHead>
-                <TableHead className="text-center">Действия</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {students.map((student) => (
+              {students.map((student, index) => (
                 <TableRow key={student.id}>
-                  <TableCell className="text-center">{student.id}</TableCell>
+                  <TableCell className="text-center">{index + 1}</TableCell>
                   <TableCell className="text-center">
-                    {student.fullName}
+                    {/* Make the student's name clickable */}
+                    <span
+                      className="cursor-pointer text-blue-500"
+                      onClick={() => navigateToAccount(student.id)}
+                    >
+                      {student.fullName}
+                    </span>
                   </TableCell>
                   <TableCell className="text-center">
                     <input
@@ -303,9 +314,7 @@ const AdminAccount = () => {
                     />
                   </TableCell>
                   <TableCell className="text-center">
-                    <Button onClick={() => navigateToAccount(student.id)}>
-                      Перейти к аккаунту
-                    </Button>
+                    {/* Remove the button, since clicking on the name will handle navigation */}
                   </TableCell>
                 </TableRow>
               ))}
