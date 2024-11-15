@@ -132,7 +132,6 @@ const AdminAccount = () => {
     }
   };
 
-  // Use toggleAccountEdit to toggle account editing state
   const toggleAccountEdit = () => {
     setIsAccountEditing((prev) => !prev);
   };

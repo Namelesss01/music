@@ -3,10 +3,19 @@ import { onAuthStateChanged, getAuth } from "firebase/auth";
 import { db } from "../firebase/config";
 import { doc, getDoc } from "firebase/firestore";
 
+interface AuthStatus {
+  isLoggedIn: boolean;
+  userType: string | null; // Can be 'admin', 'student', etc., or null if not available
+  userUid: string | null;
+  loading: boolean;
+  guitarAccess: boolean;
+  vocalAccess: boolean;
+}
+
 export const useAuthStatus = () => {
-  const [authStatus, setAuthStatus] = useState({
+  const [authStatus, setAuthStatus] = useState<AuthStatus>({
     isLoggedIn: false,
-    userType: null, // Can be 'admin', 'student', etc.
+    userType: null, // Initial value is null
     userUid: null,
     loading: true,
     guitarAccess: false,
@@ -28,7 +37,7 @@ export const useAuthStatus = () => {
 
             setAuthStatus({
               isLoggedIn: true,
-              userType: userData.userType || null,
+              userType: userData.userType || null, // Ensures userType is either string or null
               userUid: uid,
               loading: false,
               guitarAccess: userData.guitarAccess || false,
