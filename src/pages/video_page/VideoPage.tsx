@@ -23,7 +23,7 @@ const VideoPage = () => {
           return;
         }
 
-        // Fetch the video data
+        // Получение данных о видео
         const videoRef = doc(db, "files", id);
         const videoSnap = await getDoc(videoRef);
         if (!videoSnap.exists()) {
@@ -34,8 +34,8 @@ const VideoPage = () => {
         const videoData = videoSnap.data();
         setVideo({ id: videoSnap.id, ...videoData });
 
-        // Fetch the user data for access check
-        const userRef = doc(db, "users", userUid);
+        // Получение данных о пользователе для проверки доступа
+        const userRef = doc(db, "users", userUid || "");
         const userSnap = await getDoc(userRef);
         if (!userSnap.exists()) {
           setUserNotFound(true);
@@ -47,7 +47,7 @@ const VideoPage = () => {
         const hasVocalAccess = userData?.vocalAccess || false;
         const hasGuitarAccess = userData?.guitarAccess || false;
 
-        // Check access based on user type and video category
+        // Проверка доступа в зависимости от типа пользователя и категории видео
         const videoCategory = videoData.category || "";
         if (
           userType === "admin" ||
@@ -55,9 +55,9 @@ const VideoPage = () => {
           (videoCategory === "vocals" && hasVocalAccess) ||
           (videoCategory === "guitar" && hasGuitarAccess)
         ) {
-          setAccessDenied(false); // Access granted
+          setAccessDenied(false); // Доступ разрешен
         } else {
-          setAccessDenied(true); // Access denied
+          setAccessDenied(true); // Доступ запрещен
         }
       } catch (error) {
         console.error("Error fetching video:", error);
@@ -95,7 +95,7 @@ const VideoPage = () => {
   }
 
   if (!video) {
-    return <p className="text-center">Video not found</p>;
+    return <p className="text-center">Щя щя погоди щя ищу</p>;
   }
 
   return (
