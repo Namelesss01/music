@@ -33,8 +33,8 @@ interface UserData {
   email: string;
   userType: string;
   fullName: string;
-  VocalAccess?: boolean; // Only for students
-  GitareAccess?: boolean; // Only for students
+  vocalAccess?: boolean; // Only for students
+  guitarAccess?: boolean; // Only for students
   Number?: string; // Only for admins
   Info?: string; // Only for admins
 }
@@ -97,8 +97,8 @@ export function Auth(props: LayoutProps) {
       };
 
       if (userType === "student") {
-        userData.VocalAccess = false;
-        userData.GitareAccess = false;
+        userData.vocalAccess = false;
+        userData.guitarAccess = false;
       }
 
       if (userType === "admin") {

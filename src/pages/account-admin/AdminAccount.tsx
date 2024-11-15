@@ -51,6 +51,11 @@ const AdminAccount = () => {
   const auth = getAuth();
   const user = auth.currentUser;
   const userUid = user ? user.uid : null;
+  const userType = user
+    ? user.email === "admin@example.com"
+      ? "admin"
+      : "student"
+    : null; // Set user type based on email (or a different method)
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -117,6 +122,14 @@ const AdminAccount = () => {
     await Promise.all(updates);
     setIsEditing(false);
     setIsAccountEditing(false);
+  };
+
+  const navigateToAccount = (studentId: string) => {
+    if (userType === "admin") {
+      navigate(`/account-admin/${studentId}`); // Admin can go to student account
+    } else {
+      navigate("/account"); // Redirect student to their own account
+    }
   };
 
   const toggleAccountEdit = () => {
@@ -252,42 +265,46 @@ const AdminAccount = () => {
                 <TableHead className="text-center">ФИО Учеников</TableHead>
                 <TableHead className="text-center">Вокал</TableHead>
                 <TableHead className="text-center">Гитара</TableHead>
+                <TableHead className="text-center">Редактировать</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {students.map((student, index) => (
+              {students.map((student) => (
                 <TableRow key={student.id}>
-                  <TableCell className="text-center">{index + 1}</TableCell>
+                  <TableCell className="text-center">{student.id}</TableCell>
                   <TableCell className="text-center">
                     {student.fullName}
                   </TableCell>
                   <TableCell className="text-center">
                     <input
                       type="checkbox"
-                      checked={vocalAccess[student.id] || false}
+                      checked={vocalAccess[student.id]}
+                      onChange={() =>
+                        setVocalAccess((prev) => ({
+                          ...prev,
+                          [student.id]: !prev[student.id],
+                        }))
+                      }
                       disabled={!isEditing}
-                      onChange={async () => {
-                        const newAccess = !vocalAccess[student.id];
-                        setVocalAccess({
-                          ...vocalAccess,
-                          [student.id]: newAccess,
-                        });
-                      }}
                     />
                   </TableCell>
                   <TableCell className="text-center">
                     <input
                       type="checkbox"
-                      checked={guitarAccess[student.id] || false}
+                      checked={guitarAccess[student.id]}
+                      onChange={() =>
+                        setGuitarAccess((prev) => ({
+                          ...prev,
+                          [student.id]: !prev[student.id],
+                        }))
+                      }
                       disabled={!isEditing}
-                      onChange={async () => {
-                        const newAccess = !guitarAccess[student.id];
-                        setGuitarAccess({
-                          ...guitarAccess,
-                          [student.id]: newAccess,
-                        });
-                      }}
                     />
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <Button onClick={() => navigateToAccount(student.id)}>
+                      Перейти к аккаунту
+                    </Button>
                   </TableCell>
                 </TableRow>
               ))}

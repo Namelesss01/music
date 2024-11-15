@@ -25,7 +25,7 @@ function App() {
             element={
               <ProtectedRoute
                 allowedUserType="student"
-                requiredAccess="GitareAccess"
+                requiredAccess="guitarAccess"
               >
                 <Gitare />
               </ProtectedRoute>
@@ -38,7 +38,7 @@ function App() {
             element={
               <ProtectedRoute
                 allowedUserType="student"
-                requiredAccess="VocalAccess"
+                requiredAccess="vocalAccess"
               >
                 <Vocal />
               </ProtectedRoute>

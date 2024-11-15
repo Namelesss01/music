@@ -8,54 +8,56 @@ import "./video.css";
 
 const VideoPage = () => {
   const { id } = useParams<{ id: string }>();
-  const { isLoggedIn, userType, loading, userUid } = useAuthStatus(); // Get auth status
+  const { isLoggedIn, userType, loading, userUid } = useAuthStatus();
   const [video, setVideo] = useState<any>(null);
   const [accessDenied, setAccessDenied] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [userNotFound, setUserNotFound] = useState(false); // New state for user not found error
+  const [userNotFound, setUserNotFound] = useState(false);
 
   useEffect(() => {
     const fetchVideo = async () => {
-      if (!isLoggedIn) return; // Don't proceed if user is not logged in
+      if (!isLoggedIn || loading) return; // Wait until user status is loaded
       try {
-        if (id) {
-          const videoRef = doc(db, "files", id);
-          const videoSnap = await getDoc(videoRef);
-
-          if (videoSnap.exists()) {
-            const videoData = videoSnap.data();
-            setVideo({ id: videoSnap.id, ...videoData });
-
-            // Correctly use user.uid to reference the Firestore document for the logged-in user
-            const userRef = doc(db, "users", userUid); // Use userUid here instead of userType
-            const userSnap = await getDoc(userRef);
-
-            if (userSnap.exists()) {
-              const userData = userSnap.data();
-              const hasAccess = userData?.videoAccess || false;
-              const hasVocalAccess = userData?.VocalAccess || false; // Check for VocalAccess
-
-              // Admins always have access
-              if (
-                userType === "admin" ||
-                hasAccess ||
-                (userType === "student" && hasVocalAccess)
-              ) {
-                setAccessDenied(false); // Grant access if admin, videoAccess is true, or student with VocalAccess
-              } else {
-                setAccessDenied(true); // Deny access if not admin, no videoAccess, and student without VocalAccess
-              }
-            } else {
-              console.error("User not found for UID:", userUid);
-              setUserNotFound(true); // Set error state if user is not found
-            }
-          } else {
-            console.error("Video not found");
-            setError("Video not found");
-          }
-        } else {
-          console.error("Invalid video ID");
+        if (!id) {
           setError("Invalid video ID");
+          return;
+        }
+
+        // Fetch the video data
+        const videoRef = doc(db, "files", id);
+        const videoSnap = await getDoc(videoRef);
+        if (!videoSnap.exists()) {
+          setError("Video not found");
+          return;
+        }
+
+        const videoData = videoSnap.data();
+        setVideo({ id: videoSnap.id, ...videoData });
+
+        // Fetch the user data for access check
+        const userRef = doc(db, "users", userUid);
+        const userSnap = await getDoc(userRef);
+        if (!userSnap.exists()) {
+          setUserNotFound(true);
+          return;
+        }
+
+        const userData = userSnap.data();
+        const hasGeneralAccess = userData?.videoAccess || false;
+        const hasVocalAccess = userData?.vocalAccess || false;
+        const hasGuitarAccess = userData?.guitarAccess || false;
+
+        // Check access based on user type and video category
+        const videoCategory = videoData.category || "";
+        if (
+          userType === "admin" ||
+          hasGeneralAccess ||
+          (videoCategory === "vocals" && hasVocalAccess) ||
+          (videoCategory === "guitar" && hasGuitarAccess)
+        ) {
+          setAccessDenied(false); // Access granted
+        } else {
+          setAccessDenied(true); // Access denied
         }
       } catch (error) {
         console.error("Error fetching video:", error);
@@ -64,7 +66,7 @@ const VideoPage = () => {
     };
 
     fetchVideo();
-  }, [id, isLoggedIn, userUid, userType]); // Trigger fetch when login status changes
+  }, [id, isLoggedIn, userUid, userType, loading]);
 
   if (loading) {
     return <div className="loader">Loading...</div>;
@@ -87,11 +89,13 @@ const VideoPage = () => {
   }
 
   if (error) {
-    return <div>{error}</div>;
+    return (
+      <div className="error-message text-center text-red-500">{error}</div>
+    );
   }
 
   if (!video) {
-    return <p>Video not found</p>;
+    return <p className="text-center">Video not found</p>;
   }
 
   return (
@@ -107,7 +111,6 @@ const VideoPage = () => {
           muted={true}
         />
       </div>
-
       <h1 className="text-3xl font-bold mb-4 text-center">{video.name}</h1>
       <p className="text-lg text-center">
         Описание видео: {video.description || "Описание отсутствует."}

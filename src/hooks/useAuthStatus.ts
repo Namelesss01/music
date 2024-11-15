@@ -1,43 +1,71 @@
-// useAuthStatus hook
 import { useState, useEffect } from "react";
-import { onAuthStateChanged } from "firebase/auth";
-import { auth, db } from "../firebase/config";
+import { onAuthStateChanged, getAuth } from "firebase/auth";
+import { db } from "../firebase/config";
 import { doc, getDoc } from "firebase/firestore";
 
 export const useAuthStatus = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userType, setUserType] = useState<string | null>(null); // Can be 'admin', 'student', etc.
-  const [userUid, setUserUid] = useState<string | null>(null); // Track user UID
-  const [loading, setLoading] = useState(true);
+  const [authStatus, setAuthStatus] = useState({
+    isLoggedIn: false,
+    userType: null, // Can be 'admin', 'student', etc.
+    userUid: null,
+    loading: true,
+    guitarAccess: false,
+    vocalAccess: false,
+  });
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    const unsubscribe = onAuthStateChanged(getAuth(), async (user) => {
       if (user) {
-        try {
-          const userRef = doc(db, "users", user.uid);
-          const userSnap = await getDoc(userRef);
+        const uid = user.uid;
 
-          if (userSnap.exists()) {
-            const userData = userSnap.data();
-            setUserType(userData?.userType);
-            setUserUid(user.uid);
-            setIsLoggedIn(true);
+        try {
+          // Fetch user details from Firestore
+          const userDoc = await getDoc(doc(db, "users", uid));
+
+          if (userDoc.exists()) {
+            const userData = userDoc.data();
+            console.log("User Data:", userData); // Debug fetched data
+
+            setAuthStatus({
+              isLoggedIn: true,
+              userType: userData.userType || null,
+              userUid: uid,
+              loading: false,
+              guitarAccess: userData.guitarAccess || false,
+              vocalAccess: userData.vocalAccess || false,
+            });
           } else {
-            console.error("User document not found for UID:", user.uid);
-            setIsLoggedIn(false);
+            console.error("User document not found in Firestore.");
+            setAuthStatus({
+              isLoggedIn: false,
+              userType: null,
+              userUid: null,
+              loading: false,
+              guitarAccess: false,
+              vocalAccess: false,
+            });
           }
         } catch (error) {
           console.error("Error fetching user data:", error);
-          setIsLoggedIn(false);
+          setAuthStatus((prev) => ({
+            ...prev,
+            loading: false,
+          }));
         }
       } else {
-        setIsLoggedIn(false);
+        setAuthStatus({
+          isLoggedIn: false,
+          userType: null,
+          userUid: null,
+          loading: false,
+          guitarAccess: false,
+          vocalAccess: false,
+        });
       }
-      setLoading(false);
     });
 
     return () => unsubscribe();
   }, []);
 
-  return { isLoggedIn, userType, userUid, loading };
+  return authStatus;
 };

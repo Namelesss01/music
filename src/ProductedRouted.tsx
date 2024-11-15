@@ -5,7 +5,12 @@ import { useAuthStatus } from "./hooks/useAuthStatus";
 interface ProtectedRouteProps {
   children: ReactNode;
   allowedUserType?: string; // "admin" or "student"
-  requiredAccess?: "gitareAccess" | "vocalAccess"; // Required access attribute for students
+  requiredAccess?: "guitarAccess" | "vocalAccess"; // Required access attribute for students
+  loading?: boolean;
+  userUid?: string;
+  userType?: string;
+  guitarAccess?: boolean;
+  vocalAccess?: boolean;
 }
 
 const ProtectedRoute = ({
@@ -13,7 +18,7 @@ const ProtectedRoute = ({
   allowedUserType,
   requiredAccess,
 }: ProtectedRouteProps) => {
-  const { isLoggedIn, userType, gitareAccess, vocalAccess, loading } =
+  const { isLoggedIn, userType, guitarAccess, vocalAccess, loading } =
     useAuthStatus();
 
   if (loading) {
@@ -29,15 +34,13 @@ const ProtectedRoute = ({
   }
 
   if (allowedUserType === "student" && userType === "student") {
-    if (requiredAccess === "gitareAccess" && !gitareAccess) {
-      return <Navigate to="/account" />;
+    if (requiredAccess === "guitarAccess" && !guitarAccess) {
+      return <Navigate to="/main" />;
     }
     if (requiredAccess === "vocalAccess" && !vocalAccess) {
-      return <Navigate to="/account" />;
+      return <Navigate to="/main" />;
     }
   }
-
-  
 
   return <>{children}</>;
 };
