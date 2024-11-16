@@ -187,7 +187,7 @@ const AdminAccount = () => {
     <div className="p-4 md:p-8">
       <div className="flex flex-col md:flex-row justify-center items-start md:items-end gap-8 bg-white p-6 rounded-lg">
         <div className="relative">
-          <div className="relative bg-gray-300 w-[300px] h-[400px] rounded-md flex justify-center items-center mb-6 md:mb-0">
+          <div className="relative bg-gray-300 w-[300px] h-[400px] rounded-md flex justify-center items-center ml-5 mb-6 md:mb-0">
             <img
               src={profileImage || User}
               alt="User"

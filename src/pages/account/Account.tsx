@@ -106,23 +106,25 @@ const Account = () => {
   return (
     <div className="flex justify-center items-center bg-[--white] mx-auto min-h-screen">
       <div className="flex flex-col md:flex-row gap-[30px] px-4 md:px-24 w-full max-w-[1200px]">
-        <div className="relative bg-gray-300 w-[300px] h-[400px] mt-[50px] mx-auto md:mx-0 md:mt-0 rounded-md flex justify-center items-center mb-6 md:mb-0">
-          <img
-            src={profileImageUrl || User}
-            alt="User"
-            className="object-cover object-center w-full h-full rounded-md"
-          />
-          {isEditing && (
-            <label className="absolute bottom-2 bg-[--dark-blue] text-white py-1 px-3 rounded-md cursor-pointer">
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleImageUpload}
-                className="hidden"
-              />
-              Загрузить фото
-            </label>
-          )}
+        <div className="flex justify-center md:justify-start w-full md:w-auto">
+          <div className="relative bg-gray-300 w-[300px] h-[400px] rounded-md flex justify-center items-center">
+            <img
+              src={profileImageUrl || User}
+              alt="User"
+              className="object-cover object-center w-full h-full rounded-md"
+            />
+            {isEditing && (
+              <label className="absolute bottom-2 bg-[--dark-blue] text-white py-1 px-3 rounded-md cursor-pointer">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  className="hidden"
+                />
+                Загрузить фото
+              </label>
+            )}
+          </div>
         </div>
         <div className="flex flex-col gap-4 w-full md:w-[500px]">
           <Input
