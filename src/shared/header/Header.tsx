@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuthStatus } from "../../hooks/useAuthStatus";
 import { signOut } from "firebase/auth";
@@ -14,8 +14,6 @@ const Header = () => {
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
-
-  const popupRef = useRef<HTMLDivElement | null>(null);
 
   const handleLogout = async () => {
     try {
@@ -44,7 +42,7 @@ const Header = () => {
 
   const handleProtectedNavigation = (path: string) => {
     if (!isLoggedIn) {
-      setShowPopup(true);
+      setShowPopup(true); // Show the popup only if the user is not logged in
     } else {
       navigate(path);
     }
@@ -54,23 +52,10 @@ const Header = () => {
     setShowPopup(false);
   };
 
-  const handleOutsideClick = (e: MouseEvent) => {
-    if (popupRef.current && !popupRef.current.contains(e.target as Node)) {
-      closePopup();
-    }
+  const redirectToRegistration = () => {
+    navigate("/Auth");
+    closePopup(); // Close the popup but not the registration form
   };
-
-  useEffect(() => {
-    if (showPopup) {
-      document.addEventListener("mousedown", handleOutsideClick);
-    } else {
-      document.removeEventListener("mousedown", handleOutsideClick);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleOutsideClick);
-    };
-  }, [showPopup]);
 
   return (
     <div className="bg-[--dark-blue] overflow-hidden">
@@ -175,18 +160,31 @@ const Header = () => {
         </>
       )}
 
-      {showPopup && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div
-            ref={popupRef}
-            className="bg-white p-6 rounded-lg shadow-lg relative"
-          >
-            <h2 className="text-xl font-bold ">
-              Пожалуйста, зарегистрируйтесь
-            </h2>
+      {showPopup &&
+        !isLoggedIn && ( // Ensure the popup only appears when not logged in
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+            <div className="bg-white p-6 rounded-lg shadow-lg">
+              <h2 className="text-xl font-bold mb-4">
+                Пожалуйста, зарегистрируйтесь
+              </h2>
+
+              <div className="flex justify-center gap-4">
+                <Auth>
+                  <button className="bg-[--dark-blue] text-white px-4 py-2 rounded-lg">
+                    Перейти к регистрации
+                  </button>
+                </Auth>
+
+                <button
+                  onClick={closePopup}
+                  className="bg-[--dark-blue] text-white px-4 py-2 rounded-lg"
+                >
+                  Закрыть
+                </button>
+              </div>
+            </div>
           </div>
-        </div>
-      )}
+        )}
     </div>
   );
 };
