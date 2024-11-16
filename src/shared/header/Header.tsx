@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuthStatus } from "../../hooks/useAuthStatus";
 import { signOut } from "firebase/auth";
@@ -13,6 +13,9 @@ const Header = () => {
   const navigate = useNavigate();
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [showPopup, setShowPopup] = useState(false);
+
+  const popupRef = useRef<HTMLDivElement | null>(null);
 
   const handleLogout = async () => {
     try {
@@ -39,6 +42,36 @@ const Header = () => {
     setIsMenuOpen(false);
   };
 
+  const handleProtectedNavigation = (path: string) => {
+    if (!isLoggedIn) {
+      setShowPopup(true);
+    } else {
+      navigate(path);
+    }
+  };
+
+  const closePopup = () => {
+    setShowPopup(false);
+  };
+
+  const handleOutsideClick = (e: MouseEvent) => {
+    if (popupRef.current && !popupRef.current.contains(e.target as Node)) {
+      closePopup();
+    }
+  };
+
+  useEffect(() => {
+    if (showPopup) {
+      document.addEventListener("mousedown", handleOutsideClick);
+    } else {
+      document.removeEventListener("mousedown", handleOutsideClick);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleOutsideClick);
+    };
+  }, [showPopup]);
+
   return (
     <div className="bg-[--dark-blue] overflow-hidden">
       <div className="flex justify-between items-center w-full py-5 px-10">
@@ -47,16 +80,26 @@ const Header = () => {
         </Link>
 
         <div className="hidden md:flex gap-12">
-          {LINKS_ITEM.map((link) => (
-            <Link
-              key={link.label}
-              to={link.href}
-              className="text-[--white] text-xl"
-              onClick={() => handleLinkClick(link.label)}
-            >
-              {link.label}
-            </Link>
-          ))}
+          {LINKS_ITEM.map((link) =>
+            ["Вокал", "Гитара"].includes(link.label) ? (
+              <button
+                key={link.label}
+                onClick={() => handleProtectedNavigation(link.href)}
+                className="text-[--white] text-xl"
+              >
+                {link.label}
+              </button>
+            ) : (
+              <Link
+                key={link.label}
+                to={link.href}
+                className="text-[--white] text-xl"
+                onClick={() => handleLinkClick(link.label)}
+              >
+                {link.label}
+              </Link>
+            )
+          )}
         </div>
 
         <div className="flex items-center gap-4">
@@ -108,18 +151,41 @@ const Header = () => {
           ></div>
 
           <div className="md:hidden flex flex-col items-center py-4 bg-[--dark-blue] fixed top-20 left-0 right-0 z-50">
-            {LINKS_ITEM.map((link) => (
-              <Link
-                key={link.label}
-                to={link.href === "contacts" ? "#footer" : link.href}
-                className="text-[--white] text-xl py-2"
-                onClick={() => handleLinkClick(link.label)}
-              >
-                {link.label}
-              </Link>
-            ))}
+            {LINKS_ITEM.map((link) =>
+              ["Вокал", "Гитара"].includes(link.label) ? (
+                <button
+                  key={link.label}
+                  onClick={() => handleProtectedNavigation(link.href)}
+                  className="text-[--white] text-xl py-2"
+                >
+                  {link.label}
+                </button>
+              ) : (
+                <Link
+                  key={link.label}
+                  to={link.href === "contacts" ? "#footer" : link.href}
+                  className="text-[--white] text-xl py-2"
+                  onClick={() => handleLinkClick(link.label)}
+                >
+                  {link.label}
+                </Link>
+              )
+            )}
           </div>
         </>
+      )}
+
+      {showPopup && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div
+            ref={popupRef}
+            className="bg-white p-6 rounded-lg shadow-lg relative"
+          >
+            <h2 className="text-xl font-bold ">
+              Пожалуйста, зарегистрируйтесь
+            </h2>
+          </div>
+        </div>
       )}
     </div>
   );

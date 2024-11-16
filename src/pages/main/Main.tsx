@@ -148,7 +148,7 @@ const Main = () => {
               </CarouselItem>
             ))}
           </CarouselContent>
-          <div className="flex justify-between w-full absolute bottom-1 transform -translate-y-1/2">
+          <div className="justify-between w-full absolute bottom-1 hidden transform -translate-y-1/2">
             <CarouselPrevious onClick={goToPrevious} />
             <CarouselNext onClick={goToNext} />
           </div>
@@ -222,19 +222,22 @@ const Main = () => {
         </div>
       </div>
 
-      <div className="flex justify-between mb-4" ref={formRef}>
-        {" "}
-        {/* Присваиваем форму ссылке formRef */}
+      <div
+        className="flex flex-col gap-28 md:flex-row justify-center items-center mb-4 px-4"
+        ref={formRef}
+      >
+        {/* Контейнер для изображения (скрыто на мобильных) */}
         <div className="hidden md:flex">
-          <img className="ml-[50px] w-[700px]" src={People} alt="People" />
+          <img className="w-[700px]" src={People} alt="People" />
         </div>
-        <div className="px-10 mr-[10px] min-w-[300px] md:min-w-[600px] rounded-xl bg-[--white] shadow-[5px_5px_10px_rgba(0,0,0,0.25),-5px_-5px_10px_rgba(0,0,0,0.25)] ml-3 md:ml-0">
-          <h3 className="text-3xl pt-14 pb-8 font-semibold text-center">
+        {/* Контейнер формы */}
+        <div className="w-full max-w-[600px] md:min-h-[550px] rounded-xl bg-[--white] shadow-[5px_5px_10px_rgba(0,0,0,0.25),-5px_-5px_10px_rgba(0,0,0,0.25)] p-6">
+          <h3 className="text-3xl pt-6 pb-6 md:mb-10 font-semibold text-center">
             Оставить заявку
           </h3>
           <form onSubmit={handleSubmit}>
             <Input
-              className="bg-[--light-blue] mb-5 p-6 text-lg"
+              className="bg-[--light-blue] mb-4 p-5 text-xl md:mb-10"
               placeholder="Имя"
               value={formData.name}
               onChange={(e) =>
@@ -242,7 +245,7 @@ const Main = () => {
               }
             />
             <Input
-              className="bg-[--light-blue] mb-5 p-6 text-lg"
+              className="bg-[--light-blue] mb-4 p-5 text-xl md:mb-10"
               placeholder="Номер тел:"
               value={formData.phone}
               onChange={(e) =>
@@ -250,15 +253,15 @@ const Main = () => {
               }
             />
             <Input
-              className="bg-[--light-blue] mb-5 p-6 text-lg"
+              className="bg-[--light-blue] mb-4 p-5 text-xl md:mb-10"
               placeholder="Курс"
               value={formData.course}
               onChange={(e) =>
                 setFormData({ ...formData, course: e.target.value })
               }
             />
-            <div className="flex justify-center mb-4">
-              <Button type="submit" className="mt-8" disabled={isSubmitting}>
+            <div className="flex justify-center">
+              <Button type="submit" className="mt-6" disabled={isSubmitting}>
                 {isSubmitting ? "Отправка..." : "Отправить"}
               </Button>
             </div>
