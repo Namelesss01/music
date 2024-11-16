@@ -52,9 +52,11 @@ const Header = () => {
     setShowPopup(false);
   };
 
-  const redirectToRegistration = () => {
-    navigate("/Auth");
-    closePopup(); // Close the popup but not the registration form
+  const handleClickOutsidePopup = (e: React.MouseEvent) => {
+    // Close the popup if the user clicks outside of the popup
+    if (e.target === e.currentTarget) {
+      closePopup();
+    }
   };
 
   return (
@@ -162,7 +164,10 @@ const Header = () => {
 
       {showPopup &&
         !isLoggedIn && ( // Ensure the popup only appears when not logged in
-          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div
+            onClick={handleClickOutsidePopup}
+            className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+          >
             <div className="bg-white p-6 rounded-lg shadow-lg">
               <h2 className="text-xl font-bold mb-4">
                 Пожалуйста, зарегистрируйтесь
