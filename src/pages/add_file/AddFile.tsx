@@ -24,9 +24,22 @@ const AddFile = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [uploadSuccess, setUploadSuccess] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Увеличиваем максимальный размер файла (например, до 1GB)
+  const MAX_FILE_SIZE = 1024 * 1024 * 1024; // 1 GB
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFile(e.target.files ? e.target.files[0] : null);
+    const selectedFile = e.target.files ? e.target.files[0] : null;
+    if (selectedFile) {
+      if (selectedFile.size > MAX_FILE_SIZE) {
+        setError("Файл слишком большой. Максимальный размер — 1GB.");
+        setFile(null);
+      } else {
+        setFile(selectedFile);
+        setError(null); // сбрасываем ошибку
+      }
+    }
   };
 
   const handleAddClick = () => {
@@ -44,12 +57,13 @@ const AddFile = () => {
 
     uploadTask.on(
       "state_changed",
-      () => {
-        setIsLoading(true); // Show spinner during upload
+      (snapshot) => {
+        setIsLoading(true); // Показать индикатор загрузки
       },
       (error) => {
         console.error(error);
         setIsLoading(false);
+        setError("Ошибка загрузки файла.");
       },
       async () => {
         const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
@@ -63,7 +77,7 @@ const AddFile = () => {
         });
 
         setIsLoading(false);
-        setUploadSuccess(true); // Show success message
+        setUploadSuccess(true); // Сообщение об успешной загрузке
         setFile(null);
         setName("");
         setDescription("");
@@ -85,10 +99,10 @@ const AddFile = () => {
             ) : (
               <SquarePlus className="text-center text-[#1875F0]" size={30} />
             )}
-            <span className="text-[#333333] text-base fond-medium">
+            <span className="text-[#333333] text-base font-medium">
               {file ? "Файл выбран" : "Добавить фото или видео"}
             </span>
-            <span className="text-[#333333] text-xs fond-medium pt-4">
+            <span className="text-[#333333] text-xs font-medium pt-4">
               Формат файла:
             </span>
             <span className="text-[#a2a2a2] text-xs">AVI, MP4, JPG, PNG</span>
@@ -100,6 +114,7 @@ const AddFile = () => {
               accept="video/*,image/*"
             />
           </label>
+          {error && <div className="text-red-500 text-sm mt-2">{error}</div>}
         </div>
         <div className="min-w-[350px] mt-4">
           <Input
@@ -131,7 +146,6 @@ const AddFile = () => {
               </SelectContent>
             </Select>
           </div>
-
           <Textarea
             placeholder="Краткое описание"
             value={description}
