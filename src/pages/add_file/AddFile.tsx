@@ -58,6 +58,7 @@ const AddFile = () => {
     uploadTask.on(
       "state_changed",
       (snapshot) => {
+        console.log(`Upload progress: ${snapshot.bytesTransferred} / ${snapshot.totalBytes}`);
         setIsLoading(true); // Показать индикатор загрузки
       },
       (error) => {
